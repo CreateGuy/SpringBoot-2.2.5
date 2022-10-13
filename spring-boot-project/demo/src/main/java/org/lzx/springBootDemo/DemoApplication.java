@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DemoApplication {
 
 	public static void main(String[] args) {
-		System.out.println("https://baijiahao.baidu.com/s?id=1720638219097606536&wfr=spider&for=pc");
+		System.out.println("编译环境的代建：https://baijiahao.baidu.com/s?id=1720638219097606536&wfr=spider&for=pc");
 		SpringApplication.run(DemoApplication.class);
 	}
 }
