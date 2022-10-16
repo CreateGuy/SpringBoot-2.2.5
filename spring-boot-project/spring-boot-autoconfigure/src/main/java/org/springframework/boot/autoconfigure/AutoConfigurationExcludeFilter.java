@@ -27,7 +27,7 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
 
 /**
- * A {@link TypeFilter} implementation that matches registered auto-configuration classes.
+ * 判断一个bean是否标志了@Configuration并且是一个自动配置类
  *
  * @author Stephane Nicoll
  * @since 1.5.0
@@ -36,6 +36,7 @@ public class AutoConfigurationExcludeFilter implements TypeFilter, BeanClassLoad
 
 	private ClassLoader beanClassLoader;
 
+	//自动配置类集合
 	private volatile List<String> autoConfigurations;
 
 	@Override
@@ -43,6 +44,7 @@ public class AutoConfigurationExcludeFilter implements TypeFilter, BeanClassLoad
 		this.beanClassLoader = beanClassLoader;
 	}
 
+	//如果是配置类而且是自动配置类就返回true
 	@Override
 	public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
 			throws IOException {
@@ -57,6 +59,10 @@ public class AutoConfigurationExcludeFilter implements TypeFilter, BeanClassLoad
 		return getAutoConfigurations().contains(metadataReader.getClassMetadata().getClassName());
 	}
 
+	/**
+	 * 实际上是获取的所有的自动配置类
+	 * @return
+	 */
 	protected List<String> getAutoConfigurations() {
 		if (this.autoConfigurations == null) {
 			this.autoConfigurations = SpringFactoriesLoader.loadFactoryNames(EnableAutoConfiguration.class,

@@ -1,1 +1,6 @@
-user.i: 1
+user:
+  i: 1
+  j: 1
+spring:
+  profiles:
+    active: dev

@@ -71,6 +71,11 @@ public class TypeExcludeFilter implements TypeFilter, BeanFactoryAware {
 		return false;
 	}
 
+	/**
+	 * 获得容器中类型为TypeExcludeFilter的bean
+	 * 但实际上此时还在获取候选bean的筛选，beanFactory的beanDefinitionMap只有几个通过AnnotationConfigUtils放入的几个bean而已
+	 * @return
+	 */
 	private Collection<TypeExcludeFilter> getDelegates() {
 		Collection<TypeExcludeFilter> delegates = this.delegates;
 		if (delegates == null) {
