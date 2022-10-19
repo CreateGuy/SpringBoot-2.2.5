@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
  * */
 final class AutoConfigurationMetadataLoader {
 
-	//从此目录加载 AutoConfiguration
+	//从此目录加载 AutoConfiguration(待自动装配配置类)
 	protected static final String PATH = "META-INF/spring-autoconfigure-metadata.properties";
 
 	private AutoConfigurationMetadataLoader() {

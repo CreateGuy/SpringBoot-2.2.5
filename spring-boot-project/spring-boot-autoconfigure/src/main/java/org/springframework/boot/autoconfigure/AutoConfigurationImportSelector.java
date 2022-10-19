@@ -109,10 +109,13 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 */
 	protected AutoConfigurationEntry getAutoConfigurationEntry(AutoConfigurationMetadata autoConfigurationMetadata,
 			AnnotationMetadata annotationMetadata) {
+		//判断是否开启了自动配置选项
 		if (!isEnabled(annotationMetadata)) {
 			return EMPTY_ENTRY;
 		}
+		//获得有关annotationMetadata的配置，也就是
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
+		//获得当前导入选择器选择需要导入的类
 		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
 		configurations = removeDuplicates(configurations);
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
@@ -128,21 +131,26 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		return AutoConfigurationGroup.class;
 	}
 
+	/**
+	 * 判断是否开起了自动配置选项
+	 * @param metadata 导入类的注解元数据 这个只能判断导入类上是否有@EnableAutoConfiguration注解
+	 * @return
+	 */
 	protected boolean isEnabled(AnnotationMetadata metadata) {
 		if (getClass() == AutoConfigurationImportSelector.class) {
+			//从上下文看是否设置了开启自动配置选择，默认为true
 			return getEnvironment().getProperty(EnableAutoConfiguration.ENABLED_OVERRIDE_PROPERTY, Boolean.class, true);
 		}
 		return true;
 	}
 
 	/**
-	 * Return the appropriate {@link AnnotationAttributes} from the
-	 * {@link AnnotationMetadata}. By default this method will return attributes for
-	 * {@link #getAnnotationClass()}.
-	 * @param metadata the annotation metadata
-	 * @return annotation attributes
+	 * 获得导入类上有关@EnableAutoConfiguration的属性
+	 * @param metadata 导入类
+	 * @return
 	 */
 	protected AnnotationAttributes getAttributes(AnnotationMetadata metadata) {
+		//就是EnableAutoConfiguration
 		String name = getAnnotationClass().getName();
 		AnnotationAttributes attributes = AnnotationAttributes.fromMap(metadata.getAnnotationAttributes(name, true));
 		Assert.notNull(attributes, () -> "No auto-configuration attributes found. Is " + metadata.getClassName()
@@ -418,7 +426,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		}
 
 		/**
-		 * 获取所有自动配置类的元数据
+		 * 获取spring-autoconfigure-metadata.properties中所有自动配置类的元数据
 		 * @return
 		 */
 		private AutoConfigurationMetadata getAutoConfigurationMetadata() {
