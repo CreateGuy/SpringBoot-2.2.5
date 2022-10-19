@@ -27,17 +27,17 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Internal utility used to load {@link AutoConfigurationMetadata}.
- *
- * @author Phillip Webb
- */
+ * 从指定目录的指定文件加载 AutoConfiguration 的读取器
+ * */
 final class AutoConfigurationMetadataLoader {
 
+	//从此目录加载 AutoConfiguration
 	protected static final String PATH = "META-INF/spring-autoconfigure-metadata.properties";
 
 	private AutoConfigurationMetadataLoader() {
 	}
 
+	//加载元数据
 	static AutoConfigurationMetadata loadMetadata(ClassLoader classLoader) {
 		return loadMetadata(classLoader, PATH);
 	}
