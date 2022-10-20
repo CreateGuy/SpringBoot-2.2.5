@@ -60,13 +60,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link Condition} that checks for the presence or absence of specific beans.
- *
- * @author Phillip Webb
- * @author Dave Syer
- * @author Jakub Kubrynski
- * @author Stephane Nicoll
- * @author Andy Wilkinson
+ * 检查是否存在特点的bean
  * @see ConditionalOnBean
  * @see ConditionalOnMissingBean
  * @see ConditionalOnSingleCandidate

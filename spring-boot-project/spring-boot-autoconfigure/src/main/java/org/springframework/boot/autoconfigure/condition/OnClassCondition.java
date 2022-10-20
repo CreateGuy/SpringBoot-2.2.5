@@ -33,25 +33,28 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link Condition} and {@link AutoConfigurationImportFilter} that checks for the
- * presence or absence of specific classes.
- *
- * @author Phillip Webb
+ * 检查特定的类是否存在
+ * 
  * @see ConditionalOnClass
  * @see ConditionalOnMissingClass
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class OnClassCondition extends FilteringSpringBootCondition {
 
+	/**
+	 * 获得匹配结果：看自动配置类是否在另外一个配置文件中
+	 * @param autoConfigurationClasses  从META-INF/spring.factories中读取到的有关EnableAutoConfiguration的类
+	 * @param autoConfigurationMetadata 从META-INF/spring-autoconfigure-metadata.properties中读取到的类
+	 * @return
+	 */
 	@Override
 	protected final ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
-		// Split the work and perform half in a background thread if more than one
-		// processor is available. Using a single additional thread seems to offer the
-		// best performance. More threads make things worse.
+		//如果系统内核大于1，就多开一个线程进行匹配
 		if (Runtime.getRuntime().availableProcessors() > 1) {
 			return resolveOutcomesThreaded(autoConfigurationClasses, autoConfigurationMetadata);
 		}
+		//一个线程进行匹配
 		else {
 			OutcomesResolver outcomesResolver = new StandardOutcomesResolver(autoConfigurationClasses, 0,
 					autoConfigurationClasses.length, autoConfigurationMetadata, getBeanClassLoader());
@@ -59,6 +62,12 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		}
 	}
 
+	/**
+	 * 采用两个线程进行匹配
+	 * @param autoConfigurationClasses
+	 * @param autoConfigurationMetadata
+	 * @return
+	 */
 	private ConditionOutcome[] resolveOutcomesThreaded(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
 		int split = autoConfigurationClasses.length / 2;

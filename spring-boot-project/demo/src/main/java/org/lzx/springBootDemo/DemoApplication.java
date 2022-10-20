@@ -1,12 +1,15 @@
 package org.lzx.springBootDemo;
 
+import ch.qos.logback.core.pattern.color.BoldWhiteCompositeConverter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.web.embedded.undertow.UndertowServletWebServer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +26,7 @@ import java.lang.annotation.Inherited;
  * @date 2022-10-10
  */
 @SpringBootApplication
+//@EnableAutoConfiguration(exclude = UndertowServletWebServer.class)
 //@ImportResource(value = "classpath:bean.xml")
 public class DemoApplication {
 

@@ -22,16 +22,20 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.StringUtils;
 
 /**
  * 从指定目录的指定文件加载 AutoConfiguration 的读取器
+ *  spring-autoconfigure-metadata.properties文件的格式是（自动配置的类全名.条件Condition=值），下面的第一行表示A类不需要任何条件，第二行表示B要想能够匹配成功 需要能找到C和D类
+ * com.lzx.demo.A=
+ * com.lzx.demo.B.ConditionalOnClass=com.lzx.demo.C,com.lzx.demo.D
  * */
 final class AutoConfigurationMetadataLoader {
 
-	//从此目录加载 AutoConfiguration(待自动装配配置类)
+	//从此目录加载 AutoConfiguration(待自动装配配置类的规则)
 	protected static final String PATH = "META-INF/spring-autoconfigure-metadata.properties";
 
 	private AutoConfigurationMetadataLoader() {

@@ -33,11 +33,7 @@ import org.springframework.web.context.ConfigurableWebEnvironment;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
- * {@link Condition} that checks for the presence or absence of
- * {@link WebApplicationContext}.
- *
- * @author Dave Syer
- * @author Phillip Webb
+ * 检查当前服务的类型
  * @see ConditionalOnWebApplication
  * @see ConditionalOnNotWebApplication
  */

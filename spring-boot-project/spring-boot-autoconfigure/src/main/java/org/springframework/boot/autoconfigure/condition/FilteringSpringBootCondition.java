@@ -60,6 +60,12 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 		return match;
 	}
 
+	/**
+	 * 三个实现类都实现了这个方法，也就是实现了自己进行匹配的规则
+	 * @param autoConfigurationClasses
+	 * @param autoConfigurationMetadata
+	 * @return
+	 */
 	protected abstract ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata);
 
