@@ -52,19 +52,25 @@ class AutoConfigurationSorter {
 		this.autoConfigurationMetadata = autoConfigurationMetadata;
 	}
 
+	/**
+	 * 获得排序过后的自动配置类集合
+	 * @param classNames
+	 * @return
+	 */
 	List<String> getInPriorityOrder(Collection<String> classNames) {
 		AutoConfigurationClasses classes = new AutoConfigurationClasses(this.metadataReaderFactory,
 				this.autoConfigurationMetadata, classNames);
 		List<String> orderedClassNames = new ArrayList<>(classNames);
-		// Initially sort alphabetically
+		//先按照自动配置类名称排序
 		Collections.sort(orderedClassNames);
-		// Then sort by order
+		//利用@Order注解的值进行排
 		orderedClassNames.sort((o1, o2) -> {
+			//classes是一个class，并不是上面的
 			int i1 = classes.get(o1).getOrder();
 			int i2 = classes.get(o2).getOrder();
 			return Integer.compare(i1, i2);
 		});
-		// Then respect @AutoConfigureBefore @AutoConfigureAfter
+		//根据 @AutoConfigureBefore @AutoConfigureAfter 进行排序
 		orderedClassNames = sortByAnnotation(classes, orderedClassNames);
 		return orderedClassNames;
 	}

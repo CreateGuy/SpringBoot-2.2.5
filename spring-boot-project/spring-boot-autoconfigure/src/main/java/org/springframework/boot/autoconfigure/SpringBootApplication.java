@@ -22,7 +22,9 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Arrays;
 
+import org.apache.commons.codec.language.Nysiis;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServer;
@@ -33,6 +35,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.data.repository.Repository;
+import org.springframework.stereotype.Component;
 
 /**
  * Indicates a {@link Configuration configuration} class that declares one or more
@@ -130,4 +133,5 @@ public @interface SpringBootApplication {
 	@AliasFor(annotation = Configuration.class)
 	boolean proxyBeanMethods() default true;
 
+	Component aa() default @Component;
 }

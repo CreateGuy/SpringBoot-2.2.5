@@ -262,6 +262,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	/**
 	 * 获取bean工厂的AutoConfigurationImportFilter，进行过滤
+	 * spring.factories表示要导入的自动配置类，而spring-autoconfigure-metadata.properties中是自动配置类的规则
 	 * @param configurations 从META-INF/spring.factories中读取到的有关EnableAutoConfiguration的类
 	 * @param autoConfigurationMetadata 从META-INF/spring-autoconfigure-metadata.properties中读取到的类
 	 * @return
@@ -417,8 +418,12 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	private static class AutoConfigurationGroup
 			implements DeferredImportSelector.Group, BeanClassLoaderAware, BeanFactoryAware, ResourceLoaderAware {
 
+		//保存了符合条件的自动配置类，是去了重的
+		//key是自动配置类名称，value是导入类的注解元数据
 		private final Map<String, AnnotationMetadata> entries = new LinkedHashMap<>();
 
+		//保存了符合条件的自动配置类
+		//一个AutoConfigurationEntry表示一次导入，也就是可能出现重复的导入
 		private final List<AutoConfigurationEntry> autoConfigurationEntries = new ArrayList<>();
 
 		private ClassLoader beanClassLoader;
@@ -427,6 +432,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 		private ResourceLoader resourceLoader;
 
+		//自动配置类规则元数据：从META-INF/spring-autoconfigure-metadata.properties中获取的
 		private AutoConfigurationMetadata autoConfigurationMetadata;
 
 		@Override
@@ -444,39 +450,56 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 			this.resourceLoader = resourceLoader;
 		}
 
+		/**
+		 * 使用指定的延迟ImportSelector导入自动配置类
+		 * @param annotationMetadata 导入类的注解元数据
+		 * @param deferredImportSelector 导入类上@Import中的类
+		 */
 		@Override
 		public void process(AnnotationMetadata annotationMetadata, DeferredImportSelector deferredImportSelector) {
 			Assert.state(deferredImportSelector instanceof AutoConfigurationImportSelector,
 					() -> String.format("Only %s implementations are supported, got %s",
 							AutoConfigurationImportSelector.class.getSimpleName(),
 							deferredImportSelector.getClass().getName()));
+			//获得符合条件的自动配置类
 			AutoConfigurationEntry autoConfigurationEntry = ((AutoConfigurationImportSelector) deferredImportSelector)
 					.getAutoConfigurationEntry(getAutoConfigurationMetadata(), annotationMetadata);
+			//将符合调价的自动配置类添加到对应的集合中
 			this.autoConfigurationEntries.add(autoConfigurationEntry);
 			for (String importClassName : autoConfigurationEntry.getConfigurations()) {
 				this.entries.putIfAbsent(importClassName, annotationMetadata);
 			}
 		}
 
+		/**
+		 * 获得符合条件的自动配置类的迭代器
+		 * @return
+		 */
 		@Override
 		public Iterable<Entry> selectImports() {
+			//如果没有需要自动导入的类
 			if (this.autoConfigurationEntries.isEmpty()) {
 				return Collections.emptyList();
 			}
+			//获得所有的排除过滤器
 			Set<String> allExclusions = this.autoConfigurationEntries.stream()
 					.map(AutoConfigurationEntry::getExclusions).flatMap(Collection::stream).collect(Collectors.toSet());
+			//获得所有符合条件的自动配置类
 			Set<String> processedConfigurations = this.autoConfigurationEntries.stream()
 					.map(AutoConfigurationEntry::getConfigurations).flatMap(Collection::stream)
 					.collect(Collectors.toCollection(LinkedHashSet::new));
+			//移除用户设定的不要的
 			processedConfigurations.removeAll(allExclusions);
 
+			//先对符合条件的自动配置类进行排序，然后转为迭代器
 			return sortAutoConfigurations(processedConfigurations, getAutoConfigurationMetadata()).stream()
-					.map((importClassName) -> new Entry(this.entries.get(importClassName), importClassName))
+					.map((importClassName) ->
+							new Entry(this.entries.get(importClassName), importClassName))
 					.collect(Collectors.toList());
 		}
 
 		/**
-		 * 获取spring-autoconfigure-metadata.properties中所有自动配置类的元数据
+		 * 获取spring-autoconfigure-metadata.properties中所有自动配置类的规则元数据
 		 * @return
 		 */
 		private AutoConfigurationMetadata getAutoConfigurationMetadata() {
@@ -486,6 +509,12 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 			return this.autoConfigurationMetadata;
 		}
 
+		/**
+		 * 对自动配置类进行排序
+		 * @param configurations 符合条件的自动配置类
+		 * @param autoConfigurationMetadata 自动配置类规则元数据
+		 * @return
+		 */
 		private List<String> sortAutoConfigurations(Set<String> configurations,
 				AutoConfigurationMetadata autoConfigurationMetadata) {
 			return new AutoConfigurationSorter(getMetadataReaderFactory(), autoConfigurationMetadata)
