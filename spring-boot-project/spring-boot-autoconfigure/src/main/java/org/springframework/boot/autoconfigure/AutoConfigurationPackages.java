@@ -38,19 +38,16 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
+
 /**
- * Class for storing auto-configuration packages for reference later (e.g. by JPA entity
- * scanner).
- *
- * @author Phillip Webb
- * @author Dave Syer
- * @author Oliver Gierke
- * @since 1.0.0
+ * 用于存储包路径(默认就是启动类的包路径)，方便比如 jpa entity 的扫描
+ * 我理解：是springboot不会扫描@Entity的类当作组件，那么实体和数据表的映射关系就是靠这个包路径扫描所有标注了@Entity的实体表和其中的name(表名)属性进行一个映射关系
  */
 public abstract class AutoConfigurationPackages {
 
 	private static final Log logger = LogFactory.getLog(AutoConfigurationPackages.class);
 
+	//当前类名称，用于 作为bean名称存储包路径
 	private static final String BEAN = AutoConfigurationPackages.class.getName();
 
 	/**
@@ -79,31 +76,35 @@ public abstract class AutoConfigurationPackages {
 	}
 
 	/**
-	 * Programmatically registers the auto-configuration package names. Subsequent
-	 * invocations will add the given package names to those that have already been
-	 * registered. You can use this method to manually define the base packages that will
-	 * be used for a given {@link BeanDefinitionRegistry}. Generally it's recommended that
-	 * you don't call this method directly, but instead rely on the default convention
-	 * where the package name is set from your {@code @EnableAutoConfiguration}
-	 * configuration class or classes.
-	 * @param registry the bean definition registry
-	 * @param packageNames the package names to set
+	 * 注册AutoConfigurationPackages类
+	 * @param registry
+	 * @param packageNames
 	 */
 	public static void register(BeanDefinitionRegistry registry, String... packageNames) {
 		if (registry.containsBeanDefinition(BEAN)) {
 			BeanDefinition beanDefinition = registry.getBeanDefinition(BEAN);
 			ConstructorArgumentValues constructorArguments = beanDefinition.getConstructorArgumentValues();
+			//给这个构造方法的第一个参数设置为包路径
 			constructorArguments.addIndexedArgumentValue(0, addBasePackages(constructorArguments, packageNames));
 		}
 		else {
 			GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
 			beanDefinition.setBeanClass(BasePackages.class);
+			//给这个构造方法的第一个参数设置为包路径
 			beanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(0, packageNames);
+			//设置角色为 框架
 			beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			//执行注册
 			registry.registerBeanDefinition(BEAN, beanDefinition);
 		}
 	}
 
+	/**
+	 * 将原来的包路径和后面的包路径进行合并，并返回
+	 * @param constructorArguments 构造方法持有者
+	 * @param packageNames 新的包路径
+	 * @return
+	 */
 	private static String[] addBasePackages(ConstructorArgumentValues constructorArguments, String[] packageNames) {
 		String[] existing = (String[]) constructorArguments.getIndexedArgumentValue(0, String[].class).getValue();
 		Set<String> merged = new LinkedHashSet<>();
