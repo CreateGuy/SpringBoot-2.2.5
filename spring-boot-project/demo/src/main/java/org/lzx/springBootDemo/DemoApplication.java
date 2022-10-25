@@ -2,6 +2,7 @@ package org.lzx.springBootDemo;
 
 import ch.qos.logback.core.pattern.color.BoldWhiteCompositeConverter;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +18,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Inherited;
@@ -27,7 +29,7 @@ import java.lang.annotation.Inherited;
  */
 @SpringBootApplication
 //@EnableAutoConfiguration(exclude = UndertowServletWebServer.class)
-//@ImportResource(value = "classpath:bean.xml")
+@ImportResource(value = "classpath:bean.xml")
 //@Import(value = AutoMessage.class)
 public class DemoApplication {
 
@@ -86,8 +88,8 @@ class AutoMessage {
 	}
 }
 
-@Component
-class AutoClient implements ApplicationContextAware {
+//@Component
+class AutoClient implements ApplicationContextAware, FactoryBean {
 
 	@Bean(autowireCandidate = false, name = {"1", "2", "2"})
 	public SecurityProperties.User user() {
@@ -97,6 +99,20 @@ class AutoClient implements ApplicationContextAware {
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 
+	}
+
+	private Long id;
+	private String addr;//地址
+	private String idCard;//身份证号
+
+	@Override
+	public Object getObject() throws Exception {
+		return new AutoClient();
+	}
+
+	@Override
+	public Class<?> getObjectType() {
+		return AutoClient.class;
 	}
 }
 
