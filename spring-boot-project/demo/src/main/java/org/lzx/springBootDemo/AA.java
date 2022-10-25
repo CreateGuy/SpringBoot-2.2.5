@@ -1,25 +1,27 @@
 package org.lzx.springBootDemo;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * @author liuzhixuan
  * @date 2022-10-25
  */
-//@Component
-public class AA implements FactoryBean {
+@Component(value = "aa")
+//@DependsOn(value = "autoClient")
+public class AA {
 
-	private Long id;
-	private String userName;
+	@Resource
+	private BB bb;
+}
 
-	@Override
-	public Object getObject() throws Exception {
-		return new AA();
-	}
+@Component(value = "bb")
+class BB {
 
-	@Override
-	public Class<?> getObjectType() {
-		return AA.class;
-	}
+	@Resource
+	private AA aa;
 }

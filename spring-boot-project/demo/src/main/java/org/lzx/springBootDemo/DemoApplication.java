@@ -29,7 +29,7 @@ import java.lang.annotation.Inherited;
  */
 @SpringBootApplication
 //@EnableAutoConfiguration(exclude = UndertowServletWebServer.class)
-@ImportResource(value = "classpath:bean.xml")
+//@ImportResource(value = "classpath:bean.xml")
 //@Import(value = AutoMessage.class)
 public class DemoApplication {
 
@@ -88,10 +88,10 @@ class AutoMessage {
 	}
 }
 
-//@Component
+@Component
 class AutoClient implements ApplicationContextAware, FactoryBean {
 
-	@Bean(autowireCandidate = false, name = {"1", "2", "2"})
+	@Bean(autowireCandidate = false, name = {"1"})
 	public SecurityProperties.User user() {
 		return new SecurityProperties.User();
 	}
