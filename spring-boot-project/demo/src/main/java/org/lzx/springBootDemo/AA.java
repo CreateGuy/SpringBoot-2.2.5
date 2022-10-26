@@ -40,8 +40,14 @@ public class AA extends  BB{
 
 	}
 
-	@PreDestroy
-	public void preDestroy(){
+	@PostConstruct
+	public void postConstruct2(){
+
+	}
+
+//	@PreDestroy
+	@Resource
+	public void preDestroy(AutoClient autoClient){
 
 	}
 }
