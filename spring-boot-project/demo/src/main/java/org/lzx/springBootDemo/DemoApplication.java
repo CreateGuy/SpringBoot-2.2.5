@@ -88,7 +88,7 @@ class AutoMessage {
 	}
 }
 
-@Component
+//@Component
 class AutoClient implements ApplicationContextAware, FactoryBean {
 
 	@Bean(autowireCandidate = false, name = {"1"})
