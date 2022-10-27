@@ -29,7 +29,7 @@ import java.lang.annotation.Inherited;
  */
 @SpringBootApplication
 //@EnableAutoConfiguration(exclude = UndertowServletWebServer.class)
-//@ImportResource(value = "classpath:bean.xml")
+@ImportResource(value = "classpath:bean.xml")
 //@Import(value = AutoMessage.class)
 public class DemoApplication {
 
@@ -113,6 +113,14 @@ class AutoClient implements ApplicationContextAware, FactoryBean {
 	@Override
 	public Class<?> getObjectType() {
 		return AutoClient.class;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 }
 

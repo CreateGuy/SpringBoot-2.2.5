@@ -4,7 +4,7 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<!--将 HelloService 以xml的方式,注入到容器中-->
-	<bean id="autoClient" class="org.lzx.springBootDemo.AutoClient" parent="aa"></bean>
-	<bean id="aa" class="org.lzx.springBootDemo.AA"></bean>
-
+	<bean id="autoClient" class="org.lzx.springBootDemo.AutoClient" parent="aa">
+		<property name="id" value="123"></property>
+	</bean>
 </beans>

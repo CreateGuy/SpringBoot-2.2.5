@@ -1,10 +1,13 @@
 package org.lzx.springBootDemo;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
@@ -20,20 +23,24 @@ import java.util.List;
  */
 @Component(value = "aa")
 //@DependsOn(value = "autoClient")
-public class AA extends  BB{
+@PropertySource(value = "classpath:application.yml")
+public class AA{
 
-	@Resource
+	@Autowired
 	private BB bb;
+
+	@Value("${server.port}")
+	private String port;
 
 	//@Lookup
 	//public BB printf() {
 	//	return null;
 	//}
 
-	@Bean
-	public AutoClient autoClient() {
-		return new AutoClient();
-	}
+	//@Bean
+	//public AutoClient autoClient() {
+	//	return new AutoClient();
+	//}
 
 	@PostConstruct
 	public void postConstruct(){

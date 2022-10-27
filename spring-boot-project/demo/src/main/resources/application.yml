@@ -4,3 +4,5 @@ user:
 spring:
   profiles:
     active: dev
+server:
+  port: 1111
