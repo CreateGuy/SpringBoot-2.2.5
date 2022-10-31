@@ -43,7 +43,6 @@ public class DemoApplication {
 
 	private Integer i;
 
-	@Bean
 	public AutoMessage autoMessage(AutoClient autoClient) {
 		return new AutoMessage();
 	}
@@ -85,6 +84,10 @@ class AutoMessage {
 	//}
 
 	public AutoMessage() {
+	}
+
+	public void init() {
+
 	}
 }
 

@@ -250,7 +250,7 @@ public class ErrorMvcAutoConfiguration {
 	}
 
 	/**
-	 * {@link WebServerFactoryCustomizer} that configures the server's error pages.
+	 * {@link WebServerFactoryCustomizer} 配置服务器错误页面
 	 */
 	private static class ErrorPageCustomizer implements ErrorPageRegistrar, Ordered {
 
