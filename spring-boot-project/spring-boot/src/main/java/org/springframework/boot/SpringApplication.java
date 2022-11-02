@@ -195,6 +195,10 @@ public class SpringApplication {
 
 	private static final Log logger = LogFactory.getLog(SpringApplication.class);
 
+	/**
+	 * 优先数据源
+	 * 通常执行SpringApplication.run(DemoApplication.class)的时候，传入的启动类
+	 */
 	private Set<Class<?>> primarySources;
 
 	private Set<String> sources = new LinkedHashSet<>();
