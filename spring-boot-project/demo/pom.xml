@@ -28,5 +28,12 @@
 			<artifactId>spring-boot-starter-aop</artifactId>
 			<version>2.2.5.lzx</version>
 		</dependency>
+<!--		只能用springboot版本下的springSecurity版本,不然就要出现依赖冲突
+			而5.2.2RELEASE有部分依赖无法下载。。。。。。-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+			<version>2.2.5.lzx</version>
+		</dependency>
 	</dependencies>
 </project>
