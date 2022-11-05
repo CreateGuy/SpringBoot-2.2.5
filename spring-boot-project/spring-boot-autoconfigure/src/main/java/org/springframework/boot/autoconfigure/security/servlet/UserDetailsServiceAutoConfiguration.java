@@ -41,16 +41,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link EnableAutoConfiguration Auto-configuration} for a Spring Security in-memory
- * {@link AuthenticationManager}. Adds an {@link InMemoryUserDetailsManager} with a
- * default user and generated password. This can be disabled by providing a bean of type
- * {@link AuthenticationManager}, {@link AuthenticationProvider} or
- * {@link UserDetailsService}.
- *
- * @author Dave Syer
- * @author Rob Winch
- * @author Madhura Bhave
- * @since 2.0.0
+ * 是一个自动配置类，所以他是通过spring.factories+spring-autoconfigure-metadata.properties出来的
+ * 主要是为容器中注册一个基于内存的UserDetailsManager
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(AuthenticationManager.class)
@@ -61,12 +53,21 @@ import org.springframework.util.StringUtils;
 				"org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector" })
 public class UserDetailsServiceAutoConfiguration {
 
+	/**
+	 * 密码格式以{noop}开头
+	 */
 	private static final String NOOP_PASSWORD_PREFIX = "{noop}";
 
 	private static final Pattern PASSWORD_ALGORITHM_PATTERN = Pattern.compile("^\\{.+}.*$");
 
 	private static final Log logger = LogFactory.getLog(UserDetailsServiceAutoConfiguration.class);
 
+	/**
+	 * 为容器中注入一个InMemoryUserDetailsManager
+	 * @param properties
+	 * @param passwordEncoder
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(
 			type = "org.springframework.security.oauth2.client.registration.ClientRegistrationRepository")

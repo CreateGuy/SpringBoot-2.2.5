@@ -5,4 +5,4 @@ spring:
   profiles:
     active: dev
 server:
-  port: 1111
+  port: 8080
