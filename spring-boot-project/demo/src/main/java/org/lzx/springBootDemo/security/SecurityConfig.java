@@ -53,6 +53,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/hello1").hasRole("amdin11")
 				.anyRequest().authenticated()
 				.and()
+				.sessionManagement()
+				.maximumSessions(1)
+				.and()
+				.and()
 				.formLogin()
 				.and()
                 .csrf().disable();
