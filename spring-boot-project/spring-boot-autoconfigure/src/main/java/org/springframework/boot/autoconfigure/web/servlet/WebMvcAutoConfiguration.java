@@ -343,8 +343,14 @@ public class WebMvcAutoConfiguration {
 
 		private final ResourceProperties resourceProperties;
 
+		/**
+		 * 有关SpringMvc的配置
+		 */
 		private final WebMvcProperties mvcProperties;
 
+		/**
+		 * bean工厂，一般情况都是 {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
+		 */
 		private final ListableBeanFactory beanFactory;
 
 		private final WebMvcRegistrations mvcRegistrations;
@@ -381,6 +387,13 @@ public class WebMvcAutoConfiguration {
 			return super.createRequestMappingHandlerAdapter();
 		}
 
+		/**
+		 * 注入 {@link RequestMappingHandlerMapping}
+		 * @param contentNegotiationManager
+		 * @param conversionService
+		 * @param resourceUrlProvider
+		 * @return
+		 */
 		@Bean
 		@Primary
 		@Override
@@ -393,27 +406,50 @@ public class WebMvcAutoConfiguration {
 					resourceUrlProvider);
 		}
 
+		/**
+		 * 注入 {@link WelcomePageHandlerMapping}
+		 * @param applicationContext
+		 * @param mvcConversionService
+		 * @param mvcResourceUrlProvider
+		 * @return
+		 */
 		@Bean
 		public WelcomePageHandlerMapping welcomePageHandlerMapping(ApplicationContext applicationContext,
 				FormattingConversionService mvcConversionService, ResourceUrlProvider mvcResourceUrlProvider) {
 			WelcomePageHandlerMapping welcomePageHandlerMapping = new WelcomePageHandlerMapping(
 					new TemplateAvailabilityProviders(applicationContext), applicationContext, getWelcomePage(),
 					this.mvcProperties.getStaticPathPattern());
+			// 注册拦截器
 			welcomePageHandlerMapping.setInterceptors(getInterceptors(mvcConversionService, mvcResourceUrlProvider));
 			return welcomePageHandlerMapping;
 		}
 
+		/**
+		 * 尝试从指定位置加载主页
+		 * @return
+		 */
 		private Optional<Resource> getWelcomePage() {
 			String[] locations = getResourceLocations(this.resourceProperties.getStaticLocations());
 			return Arrays.stream(locations).map(this::getIndexHtml).filter(this::isReadable).findFirst();
 		}
 
+		/**
+		 * 尝试从指定位置加载主页
+		 * @param location
+		 * @return
+		 */
 		private Resource getIndexHtml(String location) {
 			return this.resourceLoader.getResource(location + "index.html");
 		}
 
+		/**
+		 * 是否可读
+		 * @param resource
+		 * @return
+		 */
 		private boolean isReadable(Resource resource) {
 			try {
+				// 资源是否存
 				return resource.exists() && (resource.getURL() != null);
 			}
 			catch (Exception ex) {
@@ -421,10 +457,15 @@ public class WebMvcAutoConfiguration {
 			}
 		}
 
+		/**
+		 * 注入 {@link WebConversionService}
+		 * @return
+		 */
 		@Bean
 		@Override
 		public FormattingConversionService mvcConversionService() {
 			WebConversionService conversionService = new WebConversionService(this.mvcProperties.getDateFormat());
+			// 自定义配置
 			addFormatters(conversionService);
 			return conversionService;
 		}
@@ -477,6 +518,10 @@ public class WebMvcAutoConfiguration {
 			}
 		}
 
+		/**
+		 * 注入 {@link ContentNegotiationManager}
+		 * @return
+		 */
 		@Bean
 		@Override
 		public ContentNegotiationManager mvcContentNegotiationManager() {

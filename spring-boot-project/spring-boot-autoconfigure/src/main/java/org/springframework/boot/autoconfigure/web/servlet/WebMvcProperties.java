@@ -27,14 +27,7 @@ import org.springframework.util.Assert;
 import org.springframework.validation.DefaultMessageCodesResolver;
 
 /**
- * {@link ConfigurationProperties properties} for Spring MVC.
- *
- * @author Phillip Webb
- * @author Sébastien Deleuze
- * @author Stephane Nicoll
- * @author Eddú Meléndez
- * @author Brian Clozel
- * @since 2.0.0
+ * 有关SpringMvc的配置
  */
 @ConfigurationProperties(prefix = "spring.mvc")
 public class WebMvcProperties {
@@ -94,7 +87,7 @@ public class WebMvcProperties {
 	private boolean logResolvedException = false;
 
 	/**
-	 * Path pattern used for static resources.
+	 * 用于静态资源的路径模式
 	 */
 	private String staticPathPattern = "/**";
 

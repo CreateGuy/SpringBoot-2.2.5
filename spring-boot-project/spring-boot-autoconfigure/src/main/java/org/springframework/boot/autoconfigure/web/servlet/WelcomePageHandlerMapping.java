@@ -50,31 +50,45 @@ final class WelcomePageHandlerMapping extends AbstractUrlHandlerMapping {
 
 	WelcomePageHandlerMapping(TemplateAvailabilityProviders templateAvailabilityProviders,
 			ApplicationContext applicationContext, Optional<Resource> welcomePage, String staticPathPattern) {
+		// 当index.html存在时
 		if (welcomePage.isPresent() && "/**".equals(staticPathPattern)) {
 			logger.info("Adding welcome page: " + welcomePage.get());
 			setRootViewName("forward:index.html");
 		}
+		// 当index模板存在时
 		else if (welcomeTemplateExists(templateAvailabilityProviders, applicationContext)) {
 			logger.info("Adding welcome page template: index");
 			setRootViewName("index");
 		}
 	}
 
+	/**
+	 * 猜测是index+任何扩展名都可以，视为模板
+	 * @param templateAvailabilityProviders
+	 * @param applicationContext
+	 * @return
+	 */
 	private boolean welcomeTemplateExists(TemplateAvailabilityProviders templateAvailabilityProviders,
 			ApplicationContext applicationContext) {
 		return templateAvailabilityProviders.getProvider("index", applicationContext) != null;
 	}
 
+	/**
+	 * 设置index视图名
+	 * @param viewName
+	 */
 	private void setRootViewName(String viewName) {
 		ParameterizableViewController controller = new ParameterizableViewController();
 		controller.setViewName(viewName);
 		setRootHandler(controller);
+		// 设置此HandlerMapping顺序
 		setOrder(2);
 	}
 
 	@Override
 	public Object getHandlerInternal(HttpServletRequest request) throws Exception {
 		for (MediaType mediaType : getAcceptedMediaTypes(request)) {
+			// 只有媒体类型是 text_html 的时候才能继续
 			if (mediaType.includes(MediaType.TEXT_HTML)) {
 				return super.getHandlerInternal(request);
 			}
@@ -82,6 +96,11 @@ final class WelcomePageHandlerMapping extends AbstractUrlHandlerMapping {
 		return null;
 	}
 
+	/**
+	 * 从请求头的 ACCEPT 中获取媒体类型
+	 * @param request
+	 * @return
+	 */
 	private List<MediaType> getAcceptedMediaTypes(HttpServletRequest request) {
 		String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
 		if (StringUtils.hasText(acceptHeader)) {
