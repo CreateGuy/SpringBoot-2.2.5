@@ -42,8 +42,7 @@ public interface ErrorAttributes {
 	Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace);
 
 	/**
-	 * Return the underlying cause of the error or {@code null} if the error cannot be
-	 * extracted.
+	 * 返回错误的根本原因，如果无法提取错误，则返回空
 	 * @param webRequest the source request
 	 * @return the {@link Exception} that caused the error or {@code null}
 	 */
