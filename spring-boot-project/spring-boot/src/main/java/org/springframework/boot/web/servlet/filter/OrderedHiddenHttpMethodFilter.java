@@ -20,15 +20,12 @@ import org.springframework.core.Ordered;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 
 /**
- * {@link HiddenHttpMethodFilter} that also implements {@link Ordered}.
- *
- * @author Phillip Webb
- * @since 2.0.0
+ * 对于 {@link HiddenHttpMethodFilter}，多了排序
  */
 public class OrderedHiddenHttpMethodFilter extends HiddenHttpMethodFilter implements OrderedFilter {
 
 	/**
-	 * The default order is high to ensure the filter is applied before Spring Security.
+	 * 默认顺序是高的，以确保在Spring Security之前应用过滤器
 	 */
 	public static final int DEFAULT_ORDER = REQUEST_WRAPPER_FILTER_MAX_ORDER - 10000;
 

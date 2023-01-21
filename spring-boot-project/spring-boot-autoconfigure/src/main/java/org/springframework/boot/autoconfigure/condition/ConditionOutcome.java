@@ -20,7 +20,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Outcome for a condition match, including log message.
+ * 条件匹配的结果，包括日志消息
  *
  * @author Phillip Webb
  * @since 1.0.0
@@ -28,8 +28,14 @@ import org.springframework.util.ObjectUtils;
  */
 public class ConditionOutcome {
 
+	/**
+	 * 是否匹配
+	 */
 	private final boolean match;
 
+	/**
+	 * 匹配成功或者失败的原因
+	 */
 	private final ConditionMessage message;
 
 	/**
@@ -91,7 +97,7 @@ public class ConditionOutcome {
 	}
 
 	/**
-	 * Create a new {@link ConditionOutcome} instance for 'no match'.
+	 * 创建不匹配的 {@link ConditionOutcome}
 	 * @param message the message
 	 * @return the {@link ConditionOutcome}
 	 */

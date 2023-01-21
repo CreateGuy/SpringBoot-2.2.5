@@ -26,8 +26,8 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.core.env.Environment;
 
 /**
- * {@link Conditional @Conditional} that checks if the specified properties have a
- * specific value. By default the properties must be present in the {@link Environment}
+ * {@link Conditional @Conditional} 的衍生类，用于匹配某个属性
+ * default the properties must be present in the {@link Environment}
  * and <strong>not</strong> equal to {@code false}. The {@link #havingValue()} and
  * {@link #matchIfMissing()} attributes allow further customizations.
  * <p>
@@ -102,15 +102,14 @@ public @interface ConditionalOnProperty {
 	String[] value() default {};
 
 	/**
-	 * A prefix that should be applied to each property. The prefix automatically ends
-	 * with a dot if not specified. A valid prefix is defined by one or more words
+	 * 属性的前缀。如果没有指定，前缀自动以点结束，一个有效的前缀由一个或多个单词定义
 	 * separated with dots (e.g. {@code "acme.system.feature"}).
 	 * @return the prefix
 	 */
 	String prefix() default "";
 
 	/**
-	 * The name of the properties to test. If a prefix has been defined, it is applied to
+	 * 具体的属性名称. If a prefix has been defined, it is applied to
 	 * compute the full key of each property. For instance if the prefix is
 	 * {@code app.config} and one value is {@code my-value}, the full key would be
 	 * {@code app.config.my-value}
@@ -122,16 +121,12 @@ public @interface ConditionalOnProperty {
 	String[] name() default {};
 
 	/**
-	 * The string representation of the expected value for the properties. If not
-	 * specified, the property must <strong>not</strong> be equal to {@code false}.
-	 * @return the expected value
+	 * 属性的期望值。如果未指定，该属性不能等于false
 	 */
 	String havingValue() default "";
 
 	/**
-	 * Specify if the condition should match if the property is not set. Defaults to
-	 * {@code false}.
-	 * @return if should match if the property is missing
+	 * 当属性找不到的时候，是否忽略匹配，false为不忽略
 	 */
 	boolean matchIfMissing() default false;
 
