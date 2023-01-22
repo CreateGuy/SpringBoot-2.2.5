@@ -27,10 +27,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Conditional;
 
 /**
- * {@link Conditional @Conditional} that only matches when no beans meeting the specified
- * requirements are already contained in the {@link BeanFactory}. None of the requirements
- * must be met for the condition to match and the requirements do not have to be met by
- * the same bean.
+ * {@link Conditional @Conditional}的衍生注解，检查容器中是否没有某个Bean
  * <p>
  * When placed on a {@code @Bean} method, the bean class defaults to the return type of
  * the factory method:
@@ -66,63 +63,43 @@ import org.springframework.context.annotation.Conditional;
 public @interface ConditionalOnMissingBean {
 
 	/**
-	 * The class types of beans that should be checked. The condition matches when no bean
-	 * of each class specified is contained in the {@link BeanFactory}.
-	 * @return the class types of beans to check
+	 * 要求容器中不能有此类型的Bean
 	 */
 	Class<?>[] value() default {};
 
 	/**
-	 * The class type names of beans that should be checked. The condition matches when no
-	 * bean of each class specified is contained in the {@link BeanFactory}.
-	 * @return the class type names of beans to check
+	 * 要求容器中不能有此类型的Bean
 	 */
 	String[] type() default {};
 
 	/**
-	 * The class types of beans that should be ignored when identifying matching beans.
-	 * @return the class types of beans to ignore
-	 * @since 1.2.5
+	 * 需要忽略的Bean类型
 	 */
 	Class<?>[] ignored() default {};
 
 	/**
-	 * The class type names of beans that should be ignored when identifying matching
-	 * beans.
-	 * @return the class type names of beans to ignore
-	 * @since 1.2.5
+	 * 需要忽略的Bean类型名称
 	 */
 	String[] ignoredType() default {};
 
 	/**
-	 * The annotation type decorating a bean that should be checked. The condition matches
-	 * when each annotation specified is missing from all beans in the
-	 * {@link BeanFactory}.
-	 * @return the class-level annotation types to check
+	 * 要求容器中不能有此注解的Bean
 	 */
 	Class<? extends Annotation>[] annotation() default {};
 
 	/**
-	 * The names of beans to check. The condition matches when each bean name specified is
-	 * missing in the {@link BeanFactory}.
-	 * @return the names of beans to check
+	 * 要求容器中不能有此名称的Bean
 	 */
 	String[] name() default {};
 
 	/**
-	 * Strategy to decide if the application context hierarchy (parent contexts) should be
-	 * considered.
-	 * @return the search strategy
+	 * Bean搜索策略
 	 */
 	SearchStrategy search() default SearchStrategy.ALL;
 
 	/**
-	 * Additional classes that may contain the specified bean types within their generic
-	 * parameters. For example, an annotation declaring {@code value=Name.class} and
-	 * {@code parameterizedContainer=NameRegistration.class} would detect both
-	 * {@code Name} and {@code NameRegistration<Name>}.
-	 * @return the container types
-	 * @since 2.1.0
+	 * 检查在泛型参数中包含指定bean类型的附加类
+	 * <p>value=A.class和parameterizedContainer=B.class将同时检测A和A< B ></p>
 	 */
 	Class<?>[] parameterizedContainer() default {};
 

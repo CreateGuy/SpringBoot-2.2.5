@@ -17,25 +17,22 @@
 package org.springframework.boot.autoconfigure.condition;
 
 /**
- * Some named search strategies for beans in the bean factory hierarchy.
- *
- * @author Dave Syer
- * @since 1.0.0
+ * Bean搜索策略
  */
 public enum SearchStrategy {
 
 	/**
-	 * Search only the current context.
+	 * 只搜索当前上下文
 	 */
 	CURRENT,
 
 	/**
-	 * Search all ancestors, but not the current context.
+	 * 搜索所有祖先，但不搜索当前上下文
 	 */
 	ANCESTORS,
 
 	/**
-	 * Search the entire hierarchy.
+	 * 搜索所有上下文
 	 */
 	ALL
 

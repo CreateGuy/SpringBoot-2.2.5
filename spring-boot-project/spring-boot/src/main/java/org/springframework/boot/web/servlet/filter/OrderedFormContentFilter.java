@@ -20,7 +20,7 @@ import org.springframework.core.Ordered;
 import org.springframework.web.filter.FormContentFilter;
 
 /**
- * {@link FormContentFilter} that also implements {@link Ordered}.
+ * 相比 {@link FormContentFilter}，执行了排序
  *
  * @author Joao Pedro Evangelista
  * @author Brian Clozel

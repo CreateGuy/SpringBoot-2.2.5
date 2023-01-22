@@ -147,6 +147,10 @@ public class WebMvcAutoConfiguration {
 
 	private static final String[] SERVLET_LOCATIONS = { "/" };
 
+	/**
+	 * 为了使用客户端发起的请求支持其他的请求方式
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(HiddenHttpMethodFilter.class)
 	@ConditionalOnProperty(prefix = "spring.mvc.hiddenmethod.filter", name = "enabled", matchIfMissing = false)
@@ -154,6 +158,10 @@ public class WebMvcAutoConfiguration {
 		return new OrderedHiddenHttpMethodFilter();
 	}
 
+	/**
+	 * 为了PUT、PATCH、DELETE这样的请求方式，将请求体转为键值对形式，然后通过 getParameter 读取
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(FormContentFilter.class)
 	@ConditionalOnProperty(prefix = "spring.mvc.formcontent.filter", name = "enabled", matchIfMissing = true)

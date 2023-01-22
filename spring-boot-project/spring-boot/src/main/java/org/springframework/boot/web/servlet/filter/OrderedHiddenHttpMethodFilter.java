@@ -20,7 +20,7 @@ import org.springframework.core.Ordered;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 
 /**
- * 对于 {@link HiddenHttpMethodFilter}，多了排序
+ * 对比 {@link HiddenHttpMethodFilter}，多了排序
  */
 public class OrderedHiddenHttpMethodFilter extends HiddenHttpMethodFilter implements OrderedFilter {
 

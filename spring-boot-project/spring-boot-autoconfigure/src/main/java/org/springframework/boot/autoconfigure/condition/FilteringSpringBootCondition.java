@@ -43,9 +43,16 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 
 	private ClassLoader beanClassLoader;
 
+	/**
+	 * 返回自动配置类评估结果
+	 * @param autoConfigurationClasses 自动配置候选类
+	 * @param autoConfigurationMetadata 自动配置类规则
+	 * @return
+	 */
 	@Override
 	public boolean[] match(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
 		ConditionEvaluationReport report = ConditionEvaluationReport.find(this.beanFactory);
+		// 获得评估结果
 		ConditionOutcome[] outcomes = getOutcomes(autoConfigurationClasses, autoConfigurationMetadata);
 		boolean[] match = new boolean[outcomes.length];
 		for (int i = 0; i < outcomes.length; i++) {
@@ -53,6 +60,7 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 			if (!match[i] && outcomes[i] != null) {
 				logOutcome(autoConfigurationClasses[i], outcomes[i]);
 				if (report != null) {
+					// 记录条件评估的发生情况
 					report.recordConditionEvaluation(autoConfigurationClasses[i], this, outcomes[i]);
 				}
 			}

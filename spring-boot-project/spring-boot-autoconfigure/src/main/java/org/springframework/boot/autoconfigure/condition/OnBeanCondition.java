@@ -37,10 +37,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigurationMetadata;
 import org.springframework.boot.autoconfigure.condition.ConditionMessage.Style;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.context.annotation.ConfigurationCondition;
+import org.springframework.context.annotation.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.MergedAnnotation;
@@ -130,6 +127,8 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 			matchMessage = spec.message(matchMessage).found("a primary bean from beans").items(Style.QUOTE,
 					matchResult.getNamesOfAllMatches());
 		}
+
+		// 检查 ConditionalOnMissingBean 情况
 		if (metadata.isAnnotated(ConditionalOnMissingBean.class.getName())) {
 			Spec<ConditionalOnMissingBean> spec = new Spec<>(context, metadata, annotations,
 					ConditionalOnMissingBean.class);
@@ -143,11 +142,18 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 		return ConditionOutcome.match(matchMessage);
 	}
 
+	/**
+	 * 返回匹配结果
+	 * @param context
+	 * @param spec
+	 * @return
+	 */
 	protected final MatchResult getMatchingBeans(ConditionContext context, Spec<?> spec) {
 		ClassLoader classLoader = context.getClassLoader();
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 		boolean considerHierarchy = spec.getStrategy() != SearchStrategy.CURRENT;
 		Set<Class<?>> parameterizedContainers = spec.getParameterizedContainers();
+		// 是否在所有父容器中查找
 		if (spec.getStrategy() == SearchStrategy.ANCESTORS) {
 			BeanFactory parent = beanFactory.getParentBeanFactory();
 			Assert.isInstanceOf(ConfigurableListableBeanFactory.class, parent,
@@ -155,12 +161,19 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 			beanFactory = (ConfigurableListableBeanFactory) parent;
 		}
 		MatchResult result = new MatchResult();
+		// 获得所有可以忽略的Bean名称
 		Set<String> beansIgnoredByType = getNamesOfBeansIgnoredByType(classLoader, beanFactory, considerHierarchy,
 				spec.getIgnoredTypes(), parameterizedContainers);
+
+		// 类型的匹配
 		for (String type : spec.getTypes()) {
+			// 获得指定类型Bean的名称
 			Collection<String> typeMatches = getBeanNamesForType(classLoader, considerHierarchy, beanFactory, type,
 					parameterizedContainers);
+			// 移除需要忽略的
 			typeMatches.removeAll(beansIgnoredByType);
+
+			// 记录匹配不成功或者成功
 			if (typeMatches.isEmpty()) {
 				result.recordUnmatchedType(type);
 			}
@@ -168,6 +181,8 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 				result.recordMatchedType(type, typeMatches);
 			}
 		}
+
+		// 注解的匹配，和类型的匹配差不多
 		for (String annotation : spec.getAnnotations()) {
 			Set<String> annotationMatches = getBeanNamesForAnnotation(classLoader, beanFactory, annotation,
 					considerHierarchy);
@@ -179,6 +194,8 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 				result.recordMatchedAnnotation(annotation, annotationMatches);
 			}
 		}
+
+		// 名称的匹配，和类型的匹配差不多
 		for (String beanName : spec.getNames()) {
 			if (!beansIgnoredByType.contains(beanName) && containsBean(beanFactory, beanName, considerHierarchy)) {
 				result.recordMatchedName(beanName);
@@ -190,6 +207,15 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 		return result;
 	}
 
+	/**
+	 * 返回可以忽略的Bean名称
+	 * @param classLoader
+	 * @param beanFactory
+	 * @param considerHierarchy
+	 * @param ignoredTypes
+	 * @param parameterizedContainers
+	 * @return
+	 */
 	private Set<String> getNamesOfBeansIgnoredByType(ClassLoader classLoader, ListableBeanFactory beanFactory,
 			boolean considerHierarchy, Set<String> ignoredTypes, Set<Class<?>> parameterizedContainers) {
 		Set<String> result = null;
@@ -201,6 +227,16 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 		return (result != null) ? result : Collections.emptySet();
 	}
 
+	/**
+	 * 获得指定类型Bean的名称
+	 * @param classLoader
+	 * @param considerHierarchy
+	 * @param beanFactory
+	 * @param type
+	 * @param parameterizedContainers
+	 * @return
+	 * @throws LinkageError
+	 */
 	private Set<String> getBeanNamesForType(ClassLoader classLoader, boolean considerHierarchy,
 			ListableBeanFactory beanFactory, String type, Set<Class<?>> parameterizedContainers) throws LinkageError {
 		try {
@@ -226,6 +262,8 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 			ResolvableType generic = ResolvableType.forClassWithGenerics(container, type);
 			result = addAll(result, beanFactory.getBeanNamesForType(generic, true, false));
 		}
+
+		// 递归去找父容器
 		if (considerHierarchy && beanFactory instanceof HierarchicalBeanFactory) {
 			BeanFactory parent = ((HierarchicalBeanFactory) beanFactory).getParentBeanFactory();
 			if (parent instanceof ListableBeanFactory) {
@@ -236,6 +274,15 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 		return result;
 	}
 
+	/**
+	 * 从容器中获得标注了指定注解的Bean的名称
+	 * @param classLoader
+	 * @param beanFactory
+	 * @param type
+	 * @param considerHierarchy
+	 * @return
+	 * @throws LinkageError
+	 */
 	private Set<String> getBeanNamesForAnnotation(ClassLoader classLoader, ConfigurableListableBeanFactory beanFactory,
 			String type, boolean considerHierarchy) throws LinkageError {
 		Set<String> result = null;
@@ -268,6 +315,13 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 		return result;
 	}
 
+	/**
+	 * 容器中是否包含指定bean
+	 * @param beanFactory
+	 * @param beanName
+	 * @param considerHierarchy
+	 * @return
+	 */
 	private boolean containsBean(ConfigurableListableBeanFactory beanFactory, String beanName,
 			boolean considerHierarchy) {
 		if (considerHierarchy) {
@@ -375,24 +429,46 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 	}
 
 	/**
-	 * A search specification extracted from the underlying annotation.
+	 * 从底层注解提取的搜索规范，貌似只为了 {@link Conditional @Conditional} 服务
 	 */
 	private static class Spec<A extends Annotation> {
 
 		private final ClassLoader classLoader;
 
+		/**
+		 * 原注解的类型
+		 */
 		private final Class<? extends Annotation> annotationType;
 
+		/**
+		 * 要求容器中不能有此名称的Bean
+		 */
 		private final Set<String> names;
 
+		/**
+		 * 要求容器中不能有此类型的Bean
+		 */
 		private final Set<String> types;
 
+		/**
+		 * 要求容器中不能有此注解的Bean
+		 */
 		private final Set<String> annotations;
 
+		/**
+		 * 需要忽略的Bean类型名称
+		 */
 		private final Set<String> ignoredTypes;
 
+		/**
+		 * 检查在泛型参数中包含指定bean类型的附加类
+		 * <p>value=A.class和parameterizedContainer=B.class将同时检测A和A< B ></p>
+		 */
 		private final Set<Class<?>> parameterizedContainers;
 
+		/**
+		 * Bean搜索策略
+		 */
 		private final SearchStrategy strategy;
 
 		Spec(ConditionContext context, AnnotatedTypeMetadata metadata, MergedAnnotations annotations,
@@ -410,8 +486,10 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 			this.strategy = annotation.getValue("search", SearchStrategy.class).orElse(null);
 			Set<String> types = extractTypes(attributes);
 			BeanTypeDeductionException deductionException = null;
+			// 如果没有指定匹配名称和类型
 			if (types.isEmpty() && this.names.isEmpty()) {
 				try {
+					// 如果是放在方法上的注解，返回这个方法的返回值类型
 					types = deducedBeanType(context, metadata);
 				}
 				catch (BeanTypeDeductionException ex) {
@@ -419,9 +497,15 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 				}
 			}
 			this.types = types;
+			// 校验匹配规则
 			validate(deductionException);
 		}
 
+		/**
+		 * 将value和type都解析出来, 这两个是一样的
+		 * @param attributes
+		 * @return
+		 */
 		protected Set<String> extractTypes(MultiValueMap<String, Object> attributes) {
 			return extract(attributes, "value", "type");
 		}
@@ -464,7 +548,12 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 			return resolved;
 		}
 
+		/**
+		 * 校验匹配规则
+		 * @param ex
+		 */
 		protected void validate(BeanTypeDeductionException ex) {
+			// 如果要求的类型，名称，注解都为空，那还匹配什么，直接抛出异常
 			if (!hasAtLeastOneElement(this.types, this.names, this.annotations)) {
 				String message = getAnnotationName() + " did not specify a bean using type, name or annotation";
 				if (ex == null) {
@@ -474,6 +563,11 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 			}
 		}
 
+		/**
+		 * 集合数组不都为空，就返回True
+		 * @param sets
+		 * @return
+		 */
 		private boolean hasAtLeastOneElement(Set<?>... sets) {
 			for (Set<?> set : sets) {
 				if (!set.isEmpty()) {
@@ -487,13 +581,26 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 			return "@" + ClassUtils.getShortName(this.annotationType);
 		}
 
+		/**
+		 * 如果是放在方法上的注解，返回这个方法的返回值类型
+		 * @param context
+		 * @param metadata
+		 * @return
+		 */
 		private Set<String> deducedBeanType(ConditionContext context, AnnotatedTypeMetadata metadata) {
+			// 如果是放在方法上的注解，返回这个方法的返回值类型
 			if (metadata instanceof MethodMetadata && metadata.isAnnotated(Bean.class.getName())) {
 				return deducedBeanTypeForBeanMethod(context, (MethodMetadata) metadata);
 			}
 			return Collections.emptySet();
 		}
 
+		/**
+		 * 注解在方法上，然后返回这个方法的返回值类型
+		 * @param context
+		 * @param metadata
+		 * @return
+		 */
 		private Set<String> deducedBeanTypeForBeanMethod(ConditionContext context, MethodMetadata metadata) {
 			try {
 				Class<?> returnType = getReturnType(context, metadata);
@@ -645,18 +752,39 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 	 */
 	private static final class MatchResult {
 
+		/**
+		 * 注解匹配成功的Bean，键是注解名称，值是Bean名称
+		 */
 		private final Map<String, Collection<String>> matchedAnnotations = new HashMap<>();
 
+		/**
+		 * 注解匹配成功的Bean的名称
+		 */
 		private final List<String> matchedNames = new ArrayList<>();
 
+		/**
+		 * 类型匹配成功的Bean，键是类型类型，值是Bean名称
+		 */
 		private final Map<String, Collection<String>> matchedTypes = new HashMap<>();
 
+		/**
+		 * 注解没有匹配成功的Bean的名称，有可能是因为设置了忽略
+		 */
 		private final List<String> unmatchedAnnotations = new ArrayList<>();
 
+		/**
+		 * 名称匹配成功的Bean名称
+		 */
 		private final List<String> unmatchedNames = new ArrayList<>();
 
+		/**
+		 * 类型没有匹配成功的Bean的名称，有可能是因为设置了忽略
+		 */
 		private final List<String> unmatchedTypes = new ArrayList<>();
 
+		/**
+		 * 名称匹配成功的Bean的名称
+		 */
 		private final Set<String> namesOfAllMatches = new HashSet<>();
 
 		private void recordMatchedName(String name) {
@@ -673,15 +801,28 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 			this.namesOfAllMatches.addAll(matchingNames);
 		}
 
+		/**
+		 * 记录匹配成功的类型
+		 * @param annotation
+		 */
 		private void recordUnmatchedAnnotation(String annotation) {
 			this.unmatchedAnnotations.add(annotation);
 		}
 
+		/**
+		 * 记录类型匹配成功
+		 * @param type
+		 * @param matchingNames
+		 */
 		private void recordMatchedType(String type, Collection<String> matchingNames) {
 			this.matchedTypes.put(type, matchingNames);
 			this.namesOfAllMatches.addAll(matchingNames);
 		}
 
+		/**
+		 * 记录类型匹配失败
+		 * @param type
+		 */
 		private void recordUnmatchedType(String type) {
 			this.unmatchedTypes.add(type);
 		}
