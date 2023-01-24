@@ -44,6 +44,12 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 
 	private static final String REACTIVE_WEB_APPLICATION_CLASS = "org.springframework.web.reactive.HandlerResult";
 
+	/**
+	 * 针对 {@link ConditionalOnWebApplication @ConditionalOnWebApplication} 获得匹配结果, 如若某个元素为空，就代表是匹配成功的
+	 * @param autoConfigurationClasses  从META-INF/spring.factories中读取到的有关自动配置类
+	 * @param autoConfigurationMetadata 从META-INF/spring-autoconfigure-metadata.properties中读取到的自动配置类规则
+	 * @return
+	 */
 	@Override
 	protected ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
@@ -58,21 +64,30 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 		return outcomes;
 	}
 
+	/**
+	 * 返回匹配结果
+	 * @param type
+	 * @return
+	 */
 	private ConditionOutcome getOutcome(String type) {
 		if (type == null) {
 			return null;
 		}
 		ConditionMessage.Builder message = ConditionMessage.forCondition(ConditionalOnWebApplication.class);
+		// Servlet的情况
 		if (ConditionalOnWebApplication.Type.SERVLET.name().equals(type)) {
 			if (!ClassNameFilter.isPresent(SERVLET_WEB_APPLICATION_CLASS, getBeanClassLoader())) {
 				return ConditionOutcome.noMatch(message.didNotFind("servlet web application classes").atAll());
 			}
 		}
+		// Reactive的情况
 		if (ConditionalOnWebApplication.Type.REACTIVE.name().equals(type)) {
 			if (!ClassNameFilter.isPresent(REACTIVE_WEB_APPLICATION_CLASS, getBeanClassLoader())) {
 				return ConditionOutcome.noMatch(message.didNotFind("reactive web application classes").atAll());
 			}
 		}
+
+		// 两个都不能加载的情况
 		if (!ClassNameFilter.isPresent(SERVLET_WEB_APPLICATION_CLASS, getBeanClassLoader())
 				&& !ClassUtils.isPresent(REACTIVE_WEB_APPLICATION_CLASS, getBeanClassLoader())) {
 			return ConditionOutcome.noMatch(message.didNotFind("reactive or servlet web application classes").atAll());

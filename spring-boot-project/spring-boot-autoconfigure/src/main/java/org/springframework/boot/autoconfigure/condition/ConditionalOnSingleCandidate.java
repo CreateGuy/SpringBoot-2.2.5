@@ -26,14 +26,8 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Conditional;
 
 /**
- * {@link Conditional @Conditional} that only matches when a bean of the specified class
- * is already contained in the {@link BeanFactory} and a single candidate can be
- * determined.
- * <p>
- * The condition will also match if multiple matching bean instances are already contained
- * in the {@link BeanFactory} but a primary candidate has been defined; essentially, the
- * condition match if auto-wiring a bean with the defined type will succeed.
- * <p>
+ * 要求容器中必须有某个Bean，只能是一个
+ * <p>如果从容器中找到多个候选Bean，但是只有一个主要候选Bean，也算<p>
  * The condition can only match the bean definitions that have been processed by the
  * application context so far and, as such, it is strongly recommended to use this
  * condition on auto-configuration classes only. If a candidate bean may be created by
@@ -49,31 +43,17 @@ import org.springframework.context.annotation.Conditional;
 public @interface ConditionalOnSingleCandidate {
 
 	/**
-	 * The class type of bean that should be checked. The condition matches if a bean of
-	 * the class specified is contained in the {@link BeanFactory} and a primary candidate
-	 * exists in case of multiple instances.
-	 * <p>
-	 * This attribute may <strong>not</strong> be used in conjunction with
-	 * {@link #type()}, but it may be used instead of {@link #type()}.
-	 * @return the class type of the bean to check
+	 * 要求容器中只能有一个此类型的Bean
 	 */
 	Class<?> value() default Object.class;
 
 	/**
-	 * The class type name of bean that should be checked. The condition matches if a bean
-	 * of the class specified is contained in the {@link BeanFactory} and a primary
-	 * candidate exists in case of multiple instances.
-	 * <p>
-	 * This attribute may <strong>not</strong> be used in conjunction with
-	 * {@link #value()}, but it may be used instead of {@link #value()}.
-	 * @return the class type name of the bean to check
+	 * 要求容器中只能有一个此类型的Bean
 	 */
 	String type() default "";
 
 	/**
-	 * Strategy to decide if the application context hierarchy (parent contexts) should be
-	 * considered.
-	 * @return the search strategy
+	 * Bean搜索策略
 	 */
 	SearchStrategy search() default SearchStrategy.ALL;
 

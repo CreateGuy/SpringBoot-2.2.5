@@ -52,7 +52,7 @@ public interface AutoConfigurationMetadata {
 	Integer getInteger(String className, String key, Integer defaultValue);
 
 	/**
-	 * Get a {@link Set} value from the meta-data.
+	 * 以一个Set的格式返回规则
 	 * @param className the source class
 	 * @param key the meta-data key
 	 * @return the meta-data value or {@code null}

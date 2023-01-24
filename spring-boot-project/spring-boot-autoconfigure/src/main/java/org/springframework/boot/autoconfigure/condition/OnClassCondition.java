@@ -42,9 +42,9 @@ import org.springframework.util.StringUtils;
 class OnClassCondition extends FilteringSpringBootCondition {
 
 	/**
-	 * 获得匹配结果：看自动配置类是否在另外一个配置文件中
-	 * @param autoConfigurationClasses  从META-INF/spring.factories中读取到的有关EnableAutoConfiguration的类
-	 * @param autoConfigurationMetadata 从META-INF/spring-autoconfigure-metadata.properties中读取到的类
+	 * 针对 {@link ConditionalOnClass @ConditionalOnClass}获得匹配结果, 如若某个元素为空，就代表是匹配成功的
+	 * @param autoConfigurationClasses  从META-INF/spring.factories中读取到的有关自动配置类
+	 * @param autoConfigurationMetadata 从META-INF/spring-autoconfigure-metadata.properties中读取到的自动配置类规则
 	 * @return
 	 */
 	@Override
@@ -70,19 +70,34 @@ class OnClassCondition extends FilteringSpringBootCondition {
 	 */
 	private ConditionOutcome[] resolveOutcomesThreaded(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
+		// 确定第一个线程的结束位置和第二个线程的开始位置
 		int split = autoConfigurationClasses.length / 2;
+		// 创建一个多线程的匹配类
 		OutcomesResolver firstHalfResolver = createOutcomesResolver(autoConfigurationClasses, 0, split,
 				autoConfigurationMetadata);
+		// 创建第二个用当前线程的匹配类
 		OutcomesResolver secondHalfResolver = new StandardOutcomesResolver(autoConfigurationClasses, split,
 				autoConfigurationClasses.length, autoConfigurationMetadata, getBeanClassLoader());
+
+		// 开始匹配
 		ConditionOutcome[] secondHalf = secondHalfResolver.resolveOutcomes();
 		ConditionOutcome[] firstHalf = firstHalfResolver.resolveOutcomes();
+
+		// 封账匹配结果，并返回
 		ConditionOutcome[] outcomes = new ConditionOutcome[autoConfigurationClasses.length];
 		System.arraycopy(firstHalf, 0, outcomes, 0, firstHalf.length);
 		System.arraycopy(secondHalf, 0, outcomes, split, secondHalf.length);
 		return outcomes;
 	}
 
+	/**
+	 * 创建多线程的匹配类
+	 * @param autoConfigurationClasses
+	 * @param start
+	 * @param end
+	 * @param autoConfigurationMetadata
+	 * @return
+	 */
 	private OutcomesResolver createOutcomesResolver(String[] autoConfigurationClasses, int start, int end,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
 		OutcomesResolver outcomesResolver = new StandardOutcomesResolver(autoConfigurationClasses, start, end,
@@ -149,10 +164,16 @@ class OnClassCondition extends FilteringSpringBootCondition {
 
 	}
 
+	/**
+	 * 多线程匹配自动配置类
+	 */
 	private static final class ThreadedOutcomesResolver implements OutcomesResolver {
 
 		private final Thread thread;
 
+		/**
+		 * 匹配的结果
+		 */
 		private volatile ConditionOutcome[] outcomes;
 
 		private ThreadedOutcomesResolver(OutcomesResolver outcomesResolver) {
@@ -163,9 +184,11 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		@Override
 		public ConditionOutcome[] resolveOutcomes() {
 			try {
+				// 挂起当前线程，等待匹配结束
 				this.thread.join();
 			}
 			catch (InterruptedException ex) {
+				// 到这就说明被打断了
 				Thread.currentThread().interrupt();
 			}
 			return this.outcomes;
@@ -175,12 +198,24 @@ class OnClassCondition extends FilteringSpringBootCondition {
 
 	private final class StandardOutcomesResolver implements OutcomesResolver {
 
+		/**
+		 * 需要加载的自动配置类
+		 */
 		private final String[] autoConfigurationClasses;
 
+		/**
+		 * 匹配的起始位置
+		 */
 		private final int start;
 
+		/**
+		 * 匹配的结束位置
+		 */
 		private final int end;
 
+		/**
+		 * 自动配置类的规则元数据
+		 */
 		private final AutoConfigurationMetadata autoConfigurationMetadata;
 
 		private final ClassLoader beanClassLoader;
@@ -199,14 +234,25 @@ class OnClassCondition extends FilteringSpringBootCondition {
 			return getOutcomes(this.autoConfigurationClasses, this.start, this.end, this.autoConfigurationMetadata);
 		}
 
+		/**
+		 * 返回匹配结果，如若某个元素为空，就代表是匹配成功的
+		 * @param autoConfigurationClasses
+		 * @param start
+		 * @param end
+		 * @param autoConfigurationMetadata
+		 * @return
+		 */
 		private ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses, int start, int end,
 				AutoConfigurationMetadata autoConfigurationMetadata) {
 			ConditionOutcome[] outcomes = new ConditionOutcome[end - start];
 			for (int i = start; i < end; i++) {
 				String autoConfigurationClass = autoConfigurationClasses[i];
 				if (autoConfigurationClass != null) {
+					// 拿到该自动配置类的规则，可以看出只支持 ConditionalOnClass
 					String candidates = autoConfigurationMetadata.get(autoConfigurationClass, "ConditionalOnClass");
 					if (candidates != null) {
+						// 获得匹配结果
+						// i - start 是因为可是是多线程匹配
 						outcomes[i - start] = getOutcome(candidates);
 					}
 				}
@@ -214,14 +260,22 @@ class OnClassCondition extends FilteringSpringBootCondition {
 			return outcomes;
 		}
 
+		/**
+		 * 返回匹配结果，为空是条件匹配成功，需要加入容器中
+		 * @param candidates
+		 * @return
+		 */
 		private ConditionOutcome getOutcome(String candidates) {
 			try {
+				// 可能是用逗号分隔的多个类
 				if (!candidates.contains(",")) {
 					return getOutcome(candidates, this.beanClassLoader);
 				}
+				// 用逗号切分，然后匹配
 				for (String candidate : StringUtils.commaDelimitedListToStringArray(candidates)) {
 					ConditionOutcome outcome = getOutcome(candidate, this.beanClassLoader);
 					if (outcome != null) {
+						// 有任意一个不匹配就直接返回
 						return outcome;
 					}
 				}
@@ -232,6 +286,12 @@ class OnClassCondition extends FilteringSpringBootCondition {
 			return null;
 		}
 
+		/**
+		 * 使用指定的类加载器加载指定类
+		 * @param className
+		 * @param classLoader
+		 * @return
+		 */
 		private ConditionOutcome getOutcome(String className, ClassLoader classLoader) {
 			if (ClassNameFilter.MISSING.matches(className, classLoader)) {
 				return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnClass.class)

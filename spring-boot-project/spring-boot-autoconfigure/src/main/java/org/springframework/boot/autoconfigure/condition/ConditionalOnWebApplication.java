@@ -56,12 +56,12 @@ public @interface ConditionalOnWebApplication {
 		ANY,
 
 		/**
-		 * Only servlet-based web application will match.
+		 * 只有基于servlet的web应用程序将匹配
 		 */
 		SERVLET,
 
 		/**
-		 * Only reactive-based web application will match.
+		 * 只有基于响应的web应用程序才能匹配
 		 */
 		REACTIVE
 

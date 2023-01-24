@@ -31,10 +31,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Abstract base class for a {@link SpringBootCondition} that also implements
- * {@link AutoConfigurationImportFilter}.
- *
- * @author Phillip Webb
+ * 适用于自动配置类的配置规则的条件检查器
  */
 abstract class FilteringSpringBootCondition extends SpringBootCondition
 		implements AutoConfigurationImportFilter, BeanFactoryAware, BeanClassLoaderAware {
@@ -52,11 +49,12 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 	@Override
 	public boolean[] match(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
 		ConditionEvaluationReport report = ConditionEvaluationReport.find(this.beanFactory);
-		// 获得评估结果
+		// 获得评估结果, 某个元素为空代表匹配成功
 		ConditionOutcome[] outcomes = getOutcomes(autoConfigurationClasses, autoConfigurationMetadata);
 		boolean[] match = new boolean[outcomes.length];
 		for (int i = 0; i < outcomes.length; i++) {
 			match[i] = (outcomes[i] == null || outcomes[i].isMatch());
+			// 匹配失败的情况
 			if (!match[i] && outcomes[i] != null) {
 				logOutcome(autoConfigurationClasses[i], outcomes[i]);
 				if (report != null) {
@@ -102,6 +100,7 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 		}
 		List<String> matches = new ArrayList<>(classNames.size());
 		for (String candidate : classNames) {
+			// 应该是能否加载此Class
 			if (classNameFilter.matches(candidate, classLoader)) {
 				matches.add(candidate);
 			}

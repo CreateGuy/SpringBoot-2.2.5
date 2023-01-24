@@ -28,8 +28,8 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * 从指定目录的指定文件加载 AutoConfiguration 的读取器
- *  spring-autoconfigure-metadata.properties文件的格式是（自动配置的类全名.条件Condition=值），下面的第一行表示A类不需要任何条件，第二行表示B要想能够匹配成功 需要能找到C和D类
+ * 从指定目录的指定文件加载 AutoConfiguration 的读取规则
+ *  spring-autoconfigure-metadata.properties文件的格式是（自动配置的类全名.条件=值），下面的第一行表示A类不需要任何条件，第二行表示B要想能够匹配成功 需要能找到C和D类
  * com.lzx.demo.A=
  * com.lzx.demo.B.ConditionalOnClass=com.lzx.demo.C,com.lzx.demo.D
  * */
@@ -46,6 +46,12 @@ final class AutoConfigurationMetadataLoader {
 		return loadMetadata(classLoader, PATH);
 	}
 
+	/**
+	 * 加载所有jar包下的 path 路径下的属性(也就是自动配置类规则)
+	 * @param classLoader
+	 * @param path
+	 * @return
+	 */
 	static AutoConfigurationMetadata loadMetadata(ClassLoader classLoader, String path) {
 		try {
 			Enumeration<URL> urls = (classLoader != null) ? classLoader.getResources(path)
