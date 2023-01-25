@@ -25,8 +25,7 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Conditional;
 
 /**
- * {@link Conditional @Conditional} that only matches when the specified resources are on
- * the classpath.
+ * {@link Conditional @Conditional} 的衍生类，为了检查classpath中指定的资源是否存在
  *
  * @author Dave Syer
  * @since 1.0.0
@@ -38,8 +37,7 @@ import org.springframework.context.annotation.Conditional;
 public @interface ConditionalOnResource {
 
 	/**
-	 * The resources that must be present.
-	 * @return the resource paths that must be present.
+	 * 资源路径，eg: @ConditionalOnResource(resources = "classpath:bean.xml")
 	 */
 	String[] resources() default {};
 

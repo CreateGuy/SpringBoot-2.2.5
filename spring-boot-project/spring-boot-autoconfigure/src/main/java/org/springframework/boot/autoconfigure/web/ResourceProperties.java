@@ -26,8 +26,7 @@ import org.springframework.boot.convert.DurationUnit;
 import org.springframework.http.CacheControl;
 
 /**
- * Properties used to configure resource handling.
- *
+ * 用于配置资源处理的属性
  * @author Phillip Webb
  * @author Brian Clozel
  * @author Dave Syer
@@ -42,13 +41,13 @@ public class ResourceProperties {
 			"classpath:/resources/", "classpath:/static/", "classpath:/public/" };
 
 	/**
-	 * Locations of static resources. Defaults to classpath:[/META-INF/resources/,
+	 * 本地静态资源路径. 默认为 classpath:[/META-INF/resources/,
 	 * /resources/, /static/, /public/].
 	 */
 	private String[] staticLocations = CLASSPATH_RESOURCE_LOCATIONS;
 
 	/**
-	 * Whether to enable default resource handling.
+	 * 是否启用默认资源处理
 	 */
 	private boolean addMappings = true;
 
@@ -64,10 +63,16 @@ public class ResourceProperties {
 		this.staticLocations = appendSlashIfNecessary(staticLocations);
 	}
 
+	/**
+	 * 给所有静态资源路径添加后缀
+	 * @param staticLocations
+	 * @return
+	 */
 	private String[] appendSlashIfNecessary(String[] staticLocations) {
 		String[] normalized = new String[staticLocations.length];
 		for (int i = 0; i < staticLocations.length; i++) {
 			String location = staticLocations[i];
+			// 添加后缀
 			normalized[i] = location.endsWith("/") ? location : location + "/";
 		}
 		return normalized;
@@ -90,7 +95,7 @@ public class ResourceProperties {
 	}
 
 	/**
-	 * Configuration for the Spring Resource Handling chain.
+	 * Spring资源处理链的配置
 	 */
 	public static class Chain {
 
@@ -101,17 +106,17 @@ public class ResourceProperties {
 		private Boolean enabled;
 
 		/**
-		 * Whether to enable caching in the Resource chain.
+		 * 是否在资源链中启用缓存
 		 */
 		private boolean cache = true;
 
 		/**
-		 * Whether to enable HTML5 application cache manifest rewriting.
+		 * 是否启用HTML5应用程序缓存清单重写
 		 */
 		private boolean htmlApplicationCache = false;
 
 		/**
-		 * Whether to enable resolution of already compressed resources (gzip, brotli).
+		 * 是否启用已压缩资源的解析 (gzip, brotli).
 		 * Checks for a resource name with the '.gz' or '.br' file extensions.
 		 */
 		private boolean compressed = false;
@@ -168,7 +173,7 @@ public class ResourceProperties {
 	}
 
 	/**
-	 * Strategies for extracting and embedding a resource version in its URL path.
+	 * 在其URL路径中提取和嵌入资源版本的策略
 	 */
 	public static class Strategy {
 

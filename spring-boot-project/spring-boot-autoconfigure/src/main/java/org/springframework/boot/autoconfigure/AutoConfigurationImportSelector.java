@@ -103,8 +103,8 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	/**
 	 * 对自动配置类进行过滤
-	 * @param autoConfigurationMetadata 所有的自动配置类
-	 * @param annotationMetadata 导入类(默认是启动类)的注解元数据
+	 * @param autoConfigurationMetadata 导入类(默认是启动类)的注解元数据
+	 * @param annotationMetadata 所有的自动配置类
 	 * @return 符合条件的自动配置类
 	 */
 	protected AutoConfigurationEntry getAutoConfigurationEntry(AutoConfigurationMetadata autoConfigurationMetadata,

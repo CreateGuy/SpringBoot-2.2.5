@@ -159,7 +159,7 @@ public class WebMvcAutoConfiguration {
 	}
 
 	/**
-	 * 为了PUT、PATCH、DELETE这样的请求方式，将请求体转为键值对形式，然后通过 getParameter 读取
+	 * 为了PUT、PATCH、DELETE这样的请求方式，将请求体转为键值对形式，然后可以通过 getParameter 读取
 	 * @return
 	 */
 	@Bean
@@ -176,8 +176,7 @@ public class WebMvcAutoConfiguration {
 		return locations;
 	}
 
-	// Defined as a nested config to ensure WebMvcConfigurer is not read when not
-	// on the classpath
+	// 定义为嵌套配置，以确保不在类路径上时不读取WebMvcConfigurer
 	@Configuration(proxyBeanMethods = false)
 	@Import(EnableWebMvcConfiguration.class)
 	@EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
@@ -344,7 +343,7 @@ public class WebMvcAutoConfiguration {
 	}
 
 	/**
-	 * Configuration equivalent to {@code @EnableWebMvc}.
+	 * 配置等价于 {@link EnableWebMvc @EnableWebMvc}
 	 */
 	@Configuration(proxyBeanMethods = false)
 	public static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration implements ResourceLoaderAware {

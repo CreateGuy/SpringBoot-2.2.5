@@ -27,15 +27,15 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
- * {@link Condition} that checks for a required version of Java.
- *
- * @author Oliver Gierke
- * @author Phillip Webb
+ * 用于检测JVM的版本
  * @see ConditionalOnJava
  */
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
 class OnJavaCondition extends SpringBootCondition {
 
+	/**
+	 * 当前使用的JVM版本
+	 */
 	private static final JavaVersion JVM_VERSION = JavaVersion.getJavaVersion();
 
 	@Override
@@ -47,7 +47,10 @@ class OnJavaCondition extends SpringBootCondition {
 	}
 
 	protected ConditionOutcome getMatchOutcome(Range range, JavaVersion runningVersion, JavaVersion version) {
+		// 确定JVM版本是否在指定的版本范围内。
 		boolean match = isWithin(runningVersion, range, version);
+
+		// 封装返回信息
 		String expected = String.format((range != Range.EQUAL_OR_NEWER) ? "(older than %s)" : "(%s or newer)", version);
 		ConditionMessage message = ConditionMessage.forCondition(ConditionalOnJava.class, expected)
 				.foundExactly(runningVersion);
@@ -55,16 +58,18 @@ class OnJavaCondition extends SpringBootCondition {
 	}
 
 	/**
-	 * Determines if the {@code runningVersion} is within the specified range of versions.
+	 * 确定 {@link JavaVersion JavaVersion} 是否在指定的版本范围内。
 	 * @param runningVersion the current version.
 	 * @param range the range
 	 * @param version the bounds of the range
 	 * @return if this version is within the specified range
 	 */
 	private boolean isWithin(JavaVersion runningVersion, Range range, JavaVersion version) {
+		// 要求等于或者更高的情况
 		if (range == Range.EQUAL_OR_NEWER) {
 			return runningVersion.isEqualOrNewerThan(version);
 		}
+		// 要求更低的情况
 		if (range == Range.OLDER_THAN) {
 			return runningVersion.isOlderThan(version);
 		}

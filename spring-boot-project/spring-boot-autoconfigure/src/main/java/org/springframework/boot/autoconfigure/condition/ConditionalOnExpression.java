@@ -25,11 +25,7 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Conditional;
 
 /**
- * Configuration annotation for a conditional element that depends on the value of a SpEL
- * expression.
- *
- * @author Dave Syer
- * @since 1.0.0
+ * 支持以SpEL表达式去解析
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
@@ -38,9 +34,8 @@ import org.springframework.context.annotation.Conditional;
 public @interface ConditionalOnExpression {
 
 	/**
-	 * The SpEL expression to evaluate. Expression should return {@code true} if the
-	 * condition passes or {@code false} if it fails.
-	 * @return the SpEL expression
+	 * 要计算的SpEL表达式
+	 * <p>如果条件通过，表达式应返回true;如果条件失败，则返回false</p>
 	 */
 	String value() default "true";
 

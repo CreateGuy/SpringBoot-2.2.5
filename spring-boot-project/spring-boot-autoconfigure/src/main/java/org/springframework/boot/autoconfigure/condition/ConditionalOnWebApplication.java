@@ -25,13 +25,7 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Conditional;
 
 /**
- * {@link Conditional @Conditional} that matches when the application is a web
- * application. By default, any web application will match but it can be narrowed using
- * the {@link #type()} attribute.
- *
- * @author Dave Syer
- * @author Stephane Nicoll
- * @since 1.0.0
+ * {@link Conditional @Conditional} 的衍生类，要求当前是Web环境，而且还要是指定的
  */
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
@@ -40,8 +34,7 @@ import org.springframework.context.annotation.Conditional;
 public @interface ConditionalOnWebApplication {
 
 	/**
-	 * The required type of the web application.
-	 * @return the required web application type
+	 * 所需的web应用程序类型
 	 */
 	Type type() default Type.ANY;
 
@@ -51,7 +44,7 @@ public @interface ConditionalOnWebApplication {
 	enum Type {
 
 		/**
-		 * Any web application will match.
+		 * 都可以
 		 */
 		ANY,
 

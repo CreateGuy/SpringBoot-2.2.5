@@ -26,7 +26,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
- * A Condition that evaluates a SpEL expression.
+ * 用来计算SpEL表达式的条件
  *
  * @author Dave Syer
  * @author Stephane Nicoll
@@ -39,6 +39,7 @@ class OnExpressionCondition extends SpringBootCondition {
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
 		String expression = (String) metadata.getAnnotationAttributes(ConditionalOnExpression.class.getName())
 				.get("value");
+		// 包装表达式
 		expression = wrapIfNecessary(expression);
 		ConditionMessage.Builder messageBuilder = ConditionMessage.forCondition(ConditionalOnExpression.class,
 				"(" + expression + ")");
@@ -62,7 +63,7 @@ class OnExpressionCondition extends SpringBootCondition {
 	}
 
 	/**
-	 * Allow user to provide bare expression with no '#{}' wrapper.
+	 * 允许用户提供无#{}包装的裸表达式
 	 * @param expression source expression
 	 * @return wrapped expression
 	 */

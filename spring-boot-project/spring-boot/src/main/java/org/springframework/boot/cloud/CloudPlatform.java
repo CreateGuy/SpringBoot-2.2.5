@@ -23,9 +23,8 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
 
 /**
- * Simple detection for well known cloud platforms. For more advanced cloud provider
- * integration consider the Spring Cloud project.
- *
+ * 简单检测 Cloud平台。对于更高级的云提供商集成，可以考虑Spring cloud项目
+ * <p>本质上是检查项目中要使用云平台必须配置的属性必须存在</p>
  * @author Phillip Webb
  * @since 1.3.0
  * @see "https://cloud.spring.io"
@@ -69,7 +68,7 @@ public enum CloudPlatform {
 	},
 
 	/**
-	 * Kubernetes platform.
+	 * Kubernetes platform(k8s)
 	 */
 	KUBERNETES {
 

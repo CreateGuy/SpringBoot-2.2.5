@@ -110,28 +110,44 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		}
 	}
 
+	/**
+	 * 处理 {@link ConditionalOnClass @ConditionalOnBean} 和 {@link ConditionalOnMissingClass @ConditionalOnMissingClass}，返回匹配结果
+	 * @param context the condition context
+	 * @param metadata the annotation metadata
+	 * @return
+	 */
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
 		ClassLoader classLoader = context.getClassLoader();
 		ConditionMessage matchMessage = ConditionMessage.empty();
+
+		// ConditionalOnClass的情况
 		List<String> onClasses = getCandidates(metadata, ConditionalOnClass.class);
 		if (onClasses != null) {
+			// 对传入的类进行过滤，返回不能加载的类
 			List<String> missing = filter(onClasses, ClassNameFilter.MISSING, classLoader);
+			// 匹配失败：有无法加载的类
 			if (!missing.isEmpty()) {
 				return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnClass.class)
 						.didNotFind("required class", "required classes").items(Style.QUOTE, missing));
 			}
+			// 匹配成功
 			matchMessage = matchMessage.andCondition(ConditionalOnClass.class)
 					.found("required class", "required classes")
 					.items(Style.QUOTE, filter(onClasses, ClassNameFilter.PRESENT, classLoader));
 		}
+
+		// ConditionalOnMissingClass的情况
 		List<String> onMissingClasses = getCandidates(metadata, ConditionalOnMissingClass.class);
 		if (onMissingClasses != null) {
+			// 对传入的类进行过滤，返回能加载的类
 			List<String> present = filter(onMissingClasses, ClassNameFilter.PRESENT, classLoader);
+			// 匹配失败：有可以加载的类
 			if (!present.isEmpty()) {
 				return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnMissingClass.class)
 						.found("unwanted class", "unwanted classes").items(Style.QUOTE, present));
 			}
+			// 匹配成功
 			matchMessage = matchMessage.andCondition(ConditionalOnMissingClass.class)
 					.didNotFind("unwanted class", "unwanted classes")
 					.items(Style.QUOTE, filter(onMissingClasses, ClassNameFilter.MISSING, classLoader));
@@ -139,6 +155,12 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		return ConditionOutcome.match(matchMessage);
 	}
 
+	/**
+	 * 获得需要加载的类名称
+	 * @param metadata
+	 * @param annotationType
+	 * @return
+	 */
 	private List<String> getCandidates(AnnotatedTypeMetadata metadata, Class<?> annotationType) {
 		MultiValueMap<String, Object> attributes = metadata.getAllAnnotationAttributes(annotationType.getName(), true);
 		if (attributes == null) {
@@ -158,6 +180,9 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		}
 	}
 
+	/**
+	 * 用于自动配置类的
+	 */
 	private interface OutcomesResolver {
 
 		ConditionOutcome[] resolveOutcomes();
@@ -196,6 +221,9 @@ class OnClassCondition extends FilteringSpringBootCondition {
 
 	}
 
+	/**
+	 * 标准用一个线程去解析自动配置类
+	 */
 	private final class StandardOutcomesResolver implements OutcomesResolver {
 
 		/**

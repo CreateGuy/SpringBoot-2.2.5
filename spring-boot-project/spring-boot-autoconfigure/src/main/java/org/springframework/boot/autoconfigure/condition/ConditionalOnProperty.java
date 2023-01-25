@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.core.env.Environment;
 
 /**
- * {@link Conditional @Conditional} 的衍生类，用于匹配某个属性
+ * {@link Conditional @Conditional} 的衍生类，用于匹配配置文件中的某个属性
  * default the properties must be present in the {@link Environment}
  * and <strong>not</strong> equal to {@code false}. The {@link #havingValue()} and
  * {@link #matchIfMissing()} attributes allow further customizations.

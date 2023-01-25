@@ -27,6 +27,7 @@ import javax.naming.InitialContext;
 import org.springframework.context.annotation.Conditional;
 
 /**
+ * 没遇到过
  * {@link Conditional @Conditional} that matches based on the availability of a JNDI
  * {@link InitialContext} and the ability to lookup specific locations.
  *

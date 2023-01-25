@@ -30,38 +30,55 @@ import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 
 /**
- * {@link Condition} that checks for specific resources.
- *
- * @author Dave Syer
+ * 检查是否存在特定的资源
  * @see ConditionalOnResource
  */
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
 class OnResourceCondition extends SpringBootCondition {
 
+	/**
+	 * 处理 {@link ConditionalOnResource @ConditionalOnResource}，返回匹配结果
+	 * @param context the condition context
+	 * @param metadata the annotation metadata
+	 * @return
+	 */
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		// 拿到资源路径
 		MultiValueMap<String, Object> attributes = metadata
 				.getAllAnnotationAttributes(ConditionalOnResource.class.getName(), true);
 		ResourceLoader loader = context.getResourceLoader();
 		List<String> locations = new ArrayList<>();
+		// 转集合
 		collectValues(locations, attributes.get("resources"));
 		Assert.isTrue(!locations.isEmpty(),
 				"@ConditionalOnResource annotations must specify at least one resource location");
 		List<String> missing = new ArrayList<>();
+
+		// 调用ResourceLoader解析指定资源
 		for (String location : locations) {
 			String resource = context.getEnvironment().resolvePlaceholders(location);
 			if (!loader.getResource(resource).exists()) {
 				missing.add(location);
 			}
 		}
+
+		// 匹配失败
 		if (!missing.isEmpty()) {
 			return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnResource.class)
 					.didNotFind("resource", "resources").items(Style.QUOTE, missing));
 		}
+
+		// 匹配成功
 		return ConditionOutcome.match(ConditionMessage.forCondition(ConditionalOnResource.class)
 				.found("location", "locations").items(locations));
 	}
 
+	/**
+	 * 转集合
+	 * @param names
+	 * @param values
+	 */
 	private void collectValues(List<String> names, List<Object> values) {
 		for (Object value : values) {
 			for (Object item : (Object[]) value) {

@@ -67,7 +67,7 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 	}
 
 	/**
-	 * 三个实现类都实现了这个方法，也就是实现了自己进行匹配的规则
+	 * 针对自动配置类的筛选，三个实现类都实现了这个方法，也就是实现了自己进行匹配的规则
 	 * @param autoConfigurationClasses
 	 * @param autoConfigurationMetadata
 	 * @return
@@ -93,6 +93,13 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 		this.beanClassLoader = classLoader;
 	}
 
+	/**
+	 * 根据传入的 ClassNameFilter 对传入的类进行过滤
+	 * @param classNames
+	 * @param classNameFilter
+	 * @param classLoader
+	 * @return
+	 */
 	protected final List<String> filter(Collection<String> classNames, ClassNameFilter classNameFilter,
 			ClassLoader classLoader) {
 		if (CollectionUtils.isEmpty(classNames)) {

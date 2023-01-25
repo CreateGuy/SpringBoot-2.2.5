@@ -26,8 +26,7 @@ import org.springframework.boot.system.JavaVersion;
 import org.springframework.context.annotation.Conditional;
 
 /**
- * {@link Conditional @Conditional} that matches based on the JVM version the application
- * is running on.
+ * {@link Conditional @Conditional} 的衍生注解，要求JVM版本的
  *
  * @author Oliver Gierke
  * @author Phillip Webb
@@ -41,32 +40,27 @@ import org.springframework.context.annotation.Conditional;
 public @interface ConditionalOnJava {
 
 	/**
-	 * Configures whether the value configured in {@link #value()} shall be considered the
-	 * upper exclusive or lower inclusive boundary. Defaults to
-	 * {@link Range#EQUAL_OR_NEWER}.
-	 * @return the range
+	 * 要求JVM版本更高还是更低
 	 */
 	Range range() default Range.EQUAL_OR_NEWER;
 
 	/**
-	 * The {@link JavaVersion} to check for. Use {@link #range()} to specify whether the
-	 * configured value is an upper-exclusive or lower-inclusive boundary.
-	 * @return the java version
+	 * 指定的版本
 	 */
 	JavaVersion value();
 
 	/**
-	 * Range options.
+	 * JVM版本的范围
 	 */
 	enum Range {
 
 		/**
-		 * Equal to, or newer than the specified {@link JavaVersion}.
+		 * 等于或更高的版本
 		 */
 		EQUAL_OR_NEWER,
 
 		/**
-		 * Older than the specified {@link JavaVersion}.
+		 * 更低的版本
 		 */
 		OLDER_THAN
 

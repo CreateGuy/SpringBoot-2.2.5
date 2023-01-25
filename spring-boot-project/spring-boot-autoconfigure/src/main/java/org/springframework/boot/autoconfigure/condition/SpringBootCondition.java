@@ -124,7 +124,7 @@ public abstract class SpringBootCondition implements Condition {
 	}
 
 	/**
-	 * 重点：确定匹配的结果以及适当的日志输出
+	 * 重点：确定匹配的结果以及适当的日志输出，针对 {@link org.springframework.context.annotation.Conditional @Conditional} 及其衍生注解上的
 	 * @param context the condition context
 	 * @param metadata the annotation metadata
 	 * @return the condition outcome

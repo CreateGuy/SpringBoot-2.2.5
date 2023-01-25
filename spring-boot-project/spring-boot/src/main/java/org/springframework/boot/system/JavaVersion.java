@@ -92,7 +92,7 @@ public enum JavaVersion {
 	}
 
 	/**
-	 * Return if this version is equal to or newer than a given version.
+	 * 是否比指定版本要高
 	 * @param version the version to compare
 	 * @return {@code true} if this version is equal to or newer than {@code version}
 	 */
@@ -101,7 +101,7 @@ public enum JavaVersion {
 	}
 
 	/**
-	 * Return if this version is older than a given version.
+	 * 是否比指定版本要低
 	 * @param version the version to compare
 	 * @return {@code true} if this version is older than {@code version}
 	 */
