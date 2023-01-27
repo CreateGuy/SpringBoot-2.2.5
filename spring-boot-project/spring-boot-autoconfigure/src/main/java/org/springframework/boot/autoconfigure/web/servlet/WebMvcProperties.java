@@ -33,56 +33,58 @@ import org.springframework.validation.DefaultMessageCodesResolver;
 public class WebMvcProperties {
 
 	/**
-	 * Formatting strategy for message codes. For instance, `PREFIX_ERROR_CODE`.
+	 * 消息代码的格式化策略
 	 */
 	private DefaultMessageCodesResolver.Format messageCodesResolverFormat;
 
 	/**
-	 * Locale to use. By default, this locale is overridden by the "Accept-Language"
-	 * header.
+	 * 使用的Locale。默认情况下，该区域设置会被请求的"Accept-Language"请求头覆盖
 	 */
 	private Locale locale;
 
 	/**
-	 * Define how the locale should be resolved.
+	 * Locale解析策略
+	 * <p>虽然和SpringMvc的同名,后面SpringMvc会通过这个策略确定 {@link LocaleResolver}</p>
 	 */
 	private LocaleResolver localeResolver = LocaleResolver.ACCEPT_HEADER;
 
 	/**
-	 * Date format to use. For instance, `dd/MM/yyyy`.
+	 * 日期格式
+	 * <ul>
+	 *     <li>例如：' dd/MM/yyyy '</li>
+	 *     <li>后续会被使用到 {@link org.springframework.boot.autoconfigure.web.format.WebConversionService}</li>
+	 * </ul>
 	 */
 	private String dateFormat;
 
 	/**
-	 * Whether to dispatch TRACE requests to the FrameworkServlet doService method.
+	 * {@link org.springframework.web.servlet.DispatcherServlet} 是否允许接收 Trace 类型的请求方式
 	 */
 	private boolean dispatchTraceRequest = false;
 
 	/**
-	 * Whether to dispatch OPTIONS requests to the FrameworkServlet doService method.
+	 * {@link org.springframework.web.servlet.DispatcherServlet} 是否允许接收 Options 类型的请求方式
 	 */
 	private boolean dispatchOptionsRequest = true;
 
 	/**
-	 * Whether the content of the "default" model should be ignored during redirect
-	 * scenarios.
+	 * 使用默认模型还是重定向模型
+	 * <p>如果指定设置为false，那么即使不是重定向视图也会使用重定向视图</p>
 	 */
 	private boolean ignoreDefaultModelOnRedirect = true;
 
 	/**
-	 * Whether to publish a ServletRequestHandledEvent at the end of each request.
+	 * 是否在每此请求完毕发布 {@link org.springframework.web.context.support.ServletRequestHandledEvent}
 	 */
 	private boolean publishRequestHandledEvents = true;
 
 	/**
-	 * Whether a "NoHandlerFoundException" should be thrown if no Handler was found to
-	 * process a request.
+	 * 如果没有发现Handler来处理请求，是否应该抛出 {@link org.springframework.web.servlet.NoHandlerFoundException}异常
 	 */
 	private boolean throwExceptionIfNoHandlerFound = false;
 
 	/**
-	 * Whether to enable warn logging of exceptions resolved by a
-	 * "HandlerExceptionResolver", except for "DefaultHandlerExceptionResolver".
+	 * 在Debug的情况下，如果调用了异常解析器，是否应该记录日志
 	 */
 	private boolean logResolvedException = false;
 
@@ -91,14 +93,23 @@ public class WebMvcProperties {
 	 */
 	private String staticPathPattern = "/**";
 
+	/**
+	 * 异步请求超时配置
+	 */
 	private final Async async = new Async();
 
 	private final Servlet servlet = new Servlet();
 
+	/**
+	 * 视图名前缀和后缀
+	 */
 	private final View view = new View();
 
 	private final Contentnegotiation contentnegotiation = new Contentnegotiation();
 
+	/**
+	 * SpringMvc路径的匹配规则
+	 */
 	private final Pathmatch pathmatch = new Pathmatch();
 
 	public DefaultMessageCodesResolver.Format getMessageCodesResolverFormat() {
@@ -209,11 +220,13 @@ public class WebMvcProperties {
 		return this.pathmatch;
 	}
 
+	/**
+	 * 异步请求超时配置
+	 */
 	public static class Async {
 
 		/**
-		 * Amount of time before asynchronous request handling times out. If this value is
-		 * not set, the default timeout of the underlying implementation is used.
+		 * 异步请求处理超时前的时间。如果未设置此值，则使用底层实现的默认超时
 		 */
 		private Duration requestTimeout;
 
@@ -230,12 +243,12 @@ public class WebMvcProperties {
 	public static class Servlet {
 
 		/**
-		 * Path of the dispatcher servlet.
+		 * dispatcher servlet请求的默认前缀
 		 */
 		private String path = "/";
 
 		/**
-		 * Load on startup priority of the dispatcher servlet.
+		 * 加载dispatcher servlet的启动优先级
 		 */
 		private int loadOnStartup = -1;
 
@@ -289,15 +302,19 @@ public class WebMvcProperties {
 
 	}
 
+	/**
+	 * 视图名前缀和后缀
+	 */
 	public static class View {
 
 		/**
-		 * Spring MVC view prefix.
+		 * Spring MVC视图前缀
+		 * <p>即使Controller返回了Hello，但是最后还是会加上这个前缀</p>
 		 */
 		private String prefix;
 
 		/**
-		 * Spring MVC view suffix.
+		 * Spring MVC视图后缀
 		 */
 		private String suffix;
 
@@ -322,26 +339,24 @@ public class WebMvcProperties {
 	public static class Contentnegotiation {
 
 		/**
-		 * Whether the path extension in the URL path should be used to determine the
-		 * requested media type. If enabled a request "/users.pdf" will be interpreted as
-		 * a request for "application/pdf" regardless of the 'Accept' header.
+		 * 是否应该使用URL路径中的路径扩展名来确定所请求的媒体类型。
+		 * <p>如果是 ”/users.pdf“ 那么媒体类型将被解析为 "application/pdf" 而不管'Accept'头。</p>
 		 */
 		private boolean favorPathExtension = false;
 
 		/**
-		 * Whether a request parameter ("format" by default) should be used to determine
-		 * the requested media type.
+		 * 是否使用请求参数(默认为“format”)来确定所请求的媒体类型。
 		 */
 		private boolean favorParameter = false;
 
 		/**
-		 * Map file extensions to media types for content negotiation. For instance, yml
-		 * to text/yaml.
+		 * 文件类型和对应媒体类型的映射关系
+		 * <p>这样 {@link org.springframework.web.accept.ContentNegotiationManager} 中就可以转换了</p>
 		 */
 		private Map<String, MediaType> mediaTypes = new LinkedHashMap<>();
 
 		/**
-		 * Query parameter name to use when "favor-parameter" is enabled.
+		 * 如果启用了 "favorParameter", 那么就是从queryString获得文件扩展名的参数名称
 		 */
 		private String parameterName;
 
@@ -382,8 +397,8 @@ public class WebMvcProperties {
 	public static class Pathmatch {
 
 		/**
-		 * Whether to use suffix pattern match (".*") when matching patterns to requests.
-		 * If enabled a method mapped to "/users" also matches to "/users.*".
+		 * 是否使用后缀模式匹配(".*")来匹配模式请求
+		 * <p>如果启用，映射到“/users”的方法也匹配到“/users.*”</p>
 		 */
 		private boolean useSuffixPattern = false;
 
@@ -416,13 +431,12 @@ public class WebMvcProperties {
 	public enum LocaleResolver {
 
 		/**
-		 * Always use the configured locale.
+		 * 始终使用配置的区域
 		 */
 		FIXED,
 
 		/**
-		 * Use the "Accept-Language" header or the configured locale if the header is not
-		 * set.
+		 * 使用请求的“Accept-Language”请求体，如果请求头中没有，则使用已配置的区域设置
 		 */
 		ACCEPT_HEADER
 
