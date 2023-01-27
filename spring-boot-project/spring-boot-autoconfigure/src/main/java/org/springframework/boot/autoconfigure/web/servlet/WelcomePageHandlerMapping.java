@@ -35,12 +35,7 @@ import org.springframework.web.servlet.handler.AbstractUrlHandlerMapping;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 
 /**
- * An {@link AbstractUrlHandlerMapping} for an application's welcome page. Supports both
- * static and templated files. If both a static and templated index page are available,
- * the static page is preferred.
- *
- * @author Andy Wilkinson
- * @author Bruce Brouwer
+ * 支持欢迎(首页)的 {@link org.springframework.web.servlet.HandlerMapping}
  */
 final class WelcomePageHandlerMapping extends AbstractUrlHandlerMapping {
 

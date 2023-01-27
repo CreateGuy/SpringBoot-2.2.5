@@ -22,8 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
- * Interface to register key components of the {@link WebMvcConfigurationSupport} in place
- * of the default ones provided by Spring MVC.
+ * 用来替换Spring MVC提供的默认组件
  * <p>
  * All custom instances are later processed by Boot and Spring MVC configurations. A
  * single instance of this component should be registered, otherwise making it impossible

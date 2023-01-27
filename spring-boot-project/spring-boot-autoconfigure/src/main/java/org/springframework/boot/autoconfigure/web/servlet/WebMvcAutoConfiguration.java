@@ -348,6 +348,9 @@ public class WebMvcAutoConfiguration {
 	@Configuration(proxyBeanMethods = false)
 	public static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration implements ResourceLoaderAware {
 
+		/**
+		 * 配置资源处理的属性
+		 */
 		private final ResourceProperties resourceProperties;
 
 		/**
@@ -381,6 +384,7 @@ public class WebMvcAutoConfiguration {
 				@Qualifier("mvcValidator") Validator validator) {
 			RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter(contentNegotiationManager,
 					conversionService, validator);
+			// 根据配置文件确定是否禁止默认模型
 			adapter.setIgnoreDefaultModelOnRedirect(
 					this.mvcProperties == null || this.mvcProperties.isIgnoreDefaultModelOnRedirect());
 			return adapter;
@@ -388,6 +392,7 @@ public class WebMvcAutoConfiguration {
 
 		@Override
 		protected RequestMappingHandlerAdapter createRequestMappingHandlerAdapter() {
+			// 如果用户更该了 HandlerAdapter 就用用户的，否则就用默认的
 			if (this.mvcRegistrations != null && this.mvcRegistrations.getRequestMappingHandlerAdapter() != null) {
 				return this.mvcRegistrations.getRequestMappingHandlerAdapter();
 			}
@@ -477,6 +482,10 @@ public class WebMvcAutoConfiguration {
 			return conversionService;
 		}
 
+		/**
+		 * 注入 {@link Validator}
+		 * @return
+		 */
 		@Bean
 		@Override
 		public Validator mvcValidator() {
@@ -488,12 +497,16 @@ public class WebMvcAutoConfiguration {
 
 		@Override
 		protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
+			// 如果用户更该了 HandlerAdapter 就用用户的，否则就用默认的
 			if (this.mvcRegistrations != null && this.mvcRegistrations.getRequestMappingHandlerMapping() != null) {
 				return this.mvcRegistrations.getRequestMappingHandlerMapping();
 			}
 			return super.createRequestMappingHandlerMapping();
 		}
 
+		/**
+		 * 注入用于初始化 {@link org.springframework.web.bind.WebDataBinder} 的 {@link ConfigurableWebBindingInitializer}
+		 */
 		@Override
 		protected ConfigurableWebBindingInitializer getConfigurableWebBindingInitializer(
 				FormattingConversionService mvcConversionService, Validator mvcValidator) {
@@ -507,6 +520,7 @@ public class WebMvcAutoConfiguration {
 
 		@Override
 		protected ExceptionHandlerExceptionResolver createExceptionHandlerExceptionResolver() {
+			// 如果用户更该了 HandlerAdapter 就用用户的，否则就用默认的
 			if (this.mvcRegistrations != null && this.mvcRegistrations.getExceptionHandlerExceptionResolver() != null) {
 				return this.mvcRegistrations.getExceptionHandlerExceptionResolver();
 			}
@@ -515,7 +529,9 @@ public class WebMvcAutoConfiguration {
 
 		@Override
 		protected void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
+			// 自定义配置
 			super.extendHandlerExceptionResolvers(exceptionResolvers);
+			// 在Debug的情况下，如果调用了异常解析器，是否应该记录日志
 			if (this.mvcProperties.isLogResolvedException()) {
 				for (HandlerExceptionResolver resolver : exceptionResolvers) {
 					if (resolver instanceof AbstractHandlerExceptionResolver) {
@@ -533,10 +549,13 @@ public class WebMvcAutoConfiguration {
 		@Override
 		public ContentNegotiationManager mvcContentNegotiationManager() {
 			ContentNegotiationManager manager = super.mvcContentNegotiationManager();
+
 			List<ContentNegotiationStrategy> strategies = manager.getStrategies();
 			ListIterator<ContentNegotiationStrategy> iterator = strategies.listIterator();
 			while (iterator.hasNext()) {
 				ContentNegotiationStrategy strategy = iterator.next();
+				// 如果有过扩展名的，封装为PathExtensionContentNegotiationStrategy
+				// 然后就可以支持跳过了
 				if (strategy instanceof PathExtensionContentNegotiationStrategy) {
 					iterator.set(new OptionalPathExtensionContentNegotiationStrategy(strategy));
 				}
@@ -609,11 +628,13 @@ public class WebMvcAutoConfiguration {
 	}
 
 	/**
-	 * Decorator to make {@link PathExtensionContentNegotiationStrategy} optional
-	 * depending on a request attribute.
+	 * 根据请求将 {@link PathExtensionContentNegotiationStrategy} 设置为可选的
 	 */
 	static class OptionalPathExtensionContentNegotiationStrategy implements ContentNegotiationStrategy {
 
+		/**
+		 * 跳过 {@link PathExtensionContentNegotiationStrategy} 的键
+		 */
 		private static final String SKIP_ATTRIBUTE = PathExtensionContentNegotiationStrategy.class.getName() + ".SKIP";
 
 		private final ContentNegotiationStrategy delegate;
@@ -625,6 +646,8 @@ public class WebMvcAutoConfiguration {
 		@Override
 		public List<MediaType> resolveMediaTypes(NativeWebRequest webRequest)
 				throws HttpMediaTypeNotAcceptableException {
+
+			// 是否跳过扩展名的
 			Object skip = webRequest.getAttribute(SKIP_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
 			if (skip != null && Boolean.parseBoolean(skip.toString())) {
 				return MEDIA_TYPE_ALL_LIST;

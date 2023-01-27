@@ -57,6 +57,9 @@ public class WebConversionService extends DefaultFormattingConversionService {
 
 	private static final Log logger = LogFactory.getLog(WebConversionService.class);
 
+	/**
+	 * 转换日期时，用到的格式
+	 */
 	private final String dateFormat;
 
 	/**
