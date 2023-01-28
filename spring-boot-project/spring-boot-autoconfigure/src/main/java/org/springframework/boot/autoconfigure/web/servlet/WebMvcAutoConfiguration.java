@@ -65,10 +65,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.format.Formatter;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.format.Parser;
+import org.springframework.format.Printer;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
@@ -180,19 +184,32 @@ public class WebMvcAutoConfiguration {
 	@Configuration(proxyBeanMethods = false)
 	@Import(EnableWebMvcConfiguration.class)
 	@EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
+	// 排序值为最后，要确保在所有的 WebMvcConfigurer 后面
 	@Order(0)
 	public static class WebMvcAutoConfigurationAdapter implements WebMvcConfigurer {
 
 		private static final Log logger = LogFactory.getLog(WebMvcConfigurer.class);
 
+		/**
+		 * 配置资源处理的属性
+		 */
 		private final ResourceProperties resourceProperties;
 
+		/**
+		 * 有关SpringMvc的配置
+		 */
 		private final WebMvcProperties mvcProperties;
 
 		private final ListableBeanFactory beanFactory;
 
+		/**
+		 * 转换请求体信息的
+		 */
 		private final ObjectProvider<HttpMessageConverters> messageConvertersProvider;
 
+		/**
+		 * 对资源做处理的
+		 */
 		final ResourceHandlerRegistrationCustomizer resourceHandlerRegistrationCustomizer;
 
 		public WebMvcAutoConfigurationAdapter(ResourceProperties resourceProperties, WebMvcProperties mvcProperties,
@@ -205,12 +222,20 @@ public class WebMvcAutoConfiguration {
 			this.resourceHandlerRegistrationCustomizer = resourceHandlerRegistrationCustomizerProvider.getIfAvailable();
 		}
 
+		/**
+		 * 将容器中的 {@link HttpMessageConverter}，放到SpringMvc中
+		 * @param converters
+		 */
 		@Override
 		public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 			this.messageConvertersProvider
 					.ifAvailable((customConverters) -> converters.addAll(customConverters.getConverters()));
 		}
 
+		/**
+		 * 将容器中Bean名称为 applicationTaskExecutor 并且类型是 {@link AsyncTaskExecutor} 的Bean提供给异步任务配置类
+		 * @param configurer
+		 */
 		@Override
 		public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
 			if (this.beanFactory.containsBean(TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME)) {
@@ -233,6 +258,11 @@ public class WebMvcAutoConfiguration {
 					this.mvcProperties.getPathmatch().isUseRegisteredSuffixPattern());
 		}
 
+		/**
+		 * 将配置文件中关于内容协商的属性赋值给对应的配置类
+		 * <p>由于此{@link WebMvcConfigurer}是在最后初始化的，就会形成约定大于配置</p>
+		 * @param configurer
+		 */
 		@Override
 		public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 			WebMvcProperties.Contentnegotiation contentnegotiation = this.mvcProperties.getContentnegotiation();
@@ -241,10 +271,17 @@ public class WebMvcAutoConfiguration {
 			if (contentnegotiation.getParameterName() != null) {
 				configurer.parameterName(contentnegotiation.getParameterName());
 			}
+
+			// 注册扩展名和对应媒体类型的映射关系
 			Map<String, MediaType> mediaTypes = this.mvcProperties.getContentnegotiation().getMediaTypes();
 			mediaTypes.forEach(configurer::mediaType);
 		}
 
+		/**
+		 * 注册默认的视图解析器({@link InternalResourceViewResolver})
+		 * <p>这是一个内部资源视图解析器</p>
+		 * @return
+		 */
 		@Bean
 		@ConditionalOnMissingBean
 		public InternalResourceViewResolver defaultViewResolver() {
@@ -254,7 +291,12 @@ public class WebMvcAutoConfiguration {
 			return resolver;
 		}
 
+		/**
+		 * 注册 {@link BeanNameViewResolver}
+		 * @return
+		 */
 		@Bean
+		// 由于此视图解析器是通过Bean去渲染的，都没有这种Bean肯定都不需要注入到容器中了
 		@ConditionalOnBean(View.class)
 		@ConditionalOnMissingBean
 		public BeanNameViewResolver beanNameViewResolver() {
@@ -263,30 +305,45 @@ public class WebMvcAutoConfiguration {
 			return resolver;
 		}
 
+		/**
+		 * 注册{@link ContentNegotiatingViewResolver}
+		 * @return
+		 */
 		@Bean
 		@ConditionalOnBean(ViewResolver.class)
 		@ConditionalOnMissingBean(name = "viewResolver", value = ContentNegotiatingViewResolver.class)
 		public ContentNegotiatingViewResolver viewResolver(BeanFactory beanFactory) {
 			ContentNegotiatingViewResolver resolver = new ContentNegotiatingViewResolver();
 			resolver.setContentNegotiationManager(beanFactory.getBean(ContentNegotiationManager.class));
-			// ContentNegotiatingViewResolver uses all the other view resolvers to locate
-			// a view so it should have a high precedence
+			// ContentNegotiatingViewResolver使用所有其他的视图解析器来定位视图，因此它应该具有较高的优先级
 			resolver.setOrder(Ordered.HIGHEST_PRECEDENCE);
 			return resolver;
 		}
 
+		/**
+		 * 根据配置文件中有关spring.mvc的属性来注册 {@link LocaleResolver}
+		 * @return
+		 */
 		@Bean
 		@ConditionalOnMissingBean
 		@ConditionalOnProperty(prefix = "spring.mvc", name = "locale")
 		public LocaleResolver localeResolver() {
+			// 是否使用采用固定的LocaleResolver
 			if (this.mvcProperties.getLocaleResolver() == WebMvcProperties.LocaleResolver.FIXED) {
 				return new FixedLocaleResolver(this.mvcProperties.getLocale());
 			}
+
+			// 使用优先请求头的LocaleResolver
 			AcceptHeaderLocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
 			localeResolver.setDefaultLocale(this.mvcProperties.getLocale());
 			return localeResolver;
 		}
 
+
+		/**
+		 * 约定大于配置，使用配置类中的 {@link MessageCodesResolver}
+		 * @return
+		 */
 		@Override
 		public MessageCodesResolver getMessageCodesResolver() {
 			if (this.mvcProperties.getMessageCodesResolverFormat() != null) {
@@ -297,6 +354,11 @@ public class WebMvcAutoConfiguration {
 			return null;
 		}
 
+		/**
+		 * 从容器中拿出 {@link org.springframework.core.convert.converter.GenericConverter}, {@link Converter}, {@link Printer}, {@link Parser}
+		 * ，{@link Formatter} 然后放到 {@link FormatterRegistry} 中
+		 * @param registry
+		 */
 		@Override
 		public void addFormatters(FormatterRegistry registry) {
 			ApplicationConversionService.addBeans(registry, this.beanFactory);
@@ -333,6 +395,10 @@ public class WebMvcAutoConfiguration {
 			}
 		}
 
+		/**
+		 * 注入用于初始化 {@link org.springframework.context.i18n.LocaleContextHolder} 和 {@link org.springframework.web.context.request.RequestContextHolder} 的过滤器
+		 * @return
+		 */
 		@Bean
 		@ConditionalOnMissingBean({ RequestContextListener.class, RequestContextFilter.class })
 		@ConditionalOnMissingFilterBean(RequestContextFilter.class)
@@ -581,6 +647,9 @@ public class WebMvcAutoConfiguration {
 
 	}
 
+	/**
+	 * 对资源做处理的简单接口
+	 */
 	interface ResourceHandlerRegistrationCustomizer {
 
 		void customize(ResourceHandlerRegistration registration);

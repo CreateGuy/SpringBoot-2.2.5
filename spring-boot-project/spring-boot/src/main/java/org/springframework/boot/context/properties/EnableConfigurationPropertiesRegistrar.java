@@ -26,10 +26,7 @@ import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
- * {@link ImportBeanDefinitionRegistrar} for
- * {@link EnableConfigurationProperties @EnableConfigurationProperties}.
- *
- * @author Phillip Webb
+ * 通过 {@link EnableConfigurationProperties @EnableConfigurationProperties} 注册了 {@link ImportBeanDefinitionRegistrar} 然后注册配置类到容器中
  */
 class EnableConfigurationPropertiesRegistrar implements ImportBeanDefinitionRegistrar {
 
@@ -37,15 +34,25 @@ class EnableConfigurationPropertiesRegistrar implements ImportBeanDefinitionRegi
 	public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
 		registerInfrastructureBeans(registry);
 		ConfigurationPropertiesBeanRegistrar beanRegistrar = new ConfigurationPropertiesBeanRegistrar(registry);
+		// 往容器中注册 @EnableConfigurationProperties 中指定的类
 		getTypes(metadata).forEach(beanRegistrar::register);
 	}
 
+	/**
+	 * 获得需要导入到容器中的配置类
+	 * @param metadata
+	 * @return
+	 */
 	private Set<Class<?>> getTypes(AnnotationMetadata metadata) {
 		return metadata.getAnnotations().stream(EnableConfigurationProperties.class)
 				.flatMap((annotation) -> Arrays.stream(annotation.getClassArray(MergedAnnotation.VALUE)))
 				.filter((type) -> void.class != type).collect(Collectors.toSet());
 	}
 
+	/**
+	 * 注册框架中有关 {@link ConfigurationProperties} 的Bean
+	 * @param registry
+	 */
 	@SuppressWarnings("deprecation")
 	static void registerInfrastructureBeans(BeanDefinitionRegistry registry) {
 		ConfigurationPropertiesBindingPostProcessor.register(registry);

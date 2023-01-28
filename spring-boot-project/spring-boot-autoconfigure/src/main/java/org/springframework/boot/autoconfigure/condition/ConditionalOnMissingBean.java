@@ -69,6 +69,7 @@ public @interface ConditionalOnMissingBean {
 
 	/**
 	 * 要求容器中不能有此类型的Bean
+	 * <p>注意：如果 type 未指定并且这个注解放在了方法上，那么 type 就等于方法返回值</p>
 	 */
 	String[] type() default {};
 

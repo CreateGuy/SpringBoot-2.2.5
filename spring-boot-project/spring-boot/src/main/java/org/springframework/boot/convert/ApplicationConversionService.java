@@ -146,8 +146,9 @@ public class ApplicationConversionService extends FormattingConversionService {
 	}
 
 	/**
-	 * Add {@link GenericConverter}, {@link Converter}, {@link Printer}, {@link Parser}
-	 * and {@link Formatter} beans from the specified context.
+	 * 从容器中拿出 {@link GenericConverter}, {@link Converter}, {@link Printer}, {@link Parser}
+	 * ，{@link Formatter} 然后放到 {@link FormatterRegistry} 中
+	 * <p>这个 {@link FormatterRegistry} 在后面也会配置到 {@code WebConversionService} 中</p>
 	 * @param registry the service to register beans with
 	 * @param beanFactory the bean factory to get the beans from
 	 * @since 2.2.0

@@ -21,13 +21,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 
 /**
- * {@link BeanDefinition} that is used for registering
- * {@link ConfigurationProperties @ConfigurationProperties} value object beans that are
- * bound at creation time.
- *
- * @author Stephane Nicoll
- * @author Madhura Bhave
- * @author Phillip Webb
+ * {@link ConfigurationProperties @ConfigurationProperties} 类型的 {@link BeanDefinition}
+ * <p>但是我看只有当 {@link  ConfigurationProperties} 是使用构造方法注入属性的时候才会创建此 {@link BeanDefinition}， set方法是直接创建 {@link GenericBeanDefinition}</p>
  */
 final class ConfigurationPropertiesValueObjectBeanDefinition extends GenericBeanDefinition {
 

@@ -41,17 +41,31 @@ class ConfigurationPropertiesBindConstructorProvider implements BindConstructorP
 		return getBindConstructor(bindable.getType().resolve(), isNestedConstructorBinding);
 	}
 
+	/**
+	 * 返回带有 {@link ConstructorBinding} 的构造方法
+	 * @param type
+	 * @param isNestedConstructorBinding
+	 * @return
+	 */
 	Constructor<?> getBindConstructor(Class<?> type, boolean isNestedConstructorBinding) {
 		if (type == null) {
 			return null;
 		}
+		// 获得带有@ConstructorBinding的构造方法
 		Constructor<?> constructor = findConstructorBindingAnnotatedConstructor(type);
+		// 构造方法上没有@ConstructorBinding，那就在类上看是否有@ConstructorBinding
 		if (constructor == null && (isConstructorBindingAnnotatedType(type) || isNestedConstructorBinding)) {
+			// 获得唯一有入参的的构造方法
 			constructor = deduceBindConstructor(type);
 		}
 		return constructor;
 	}
 
+	/**
+	 * 返回带有 {@link ConstructorBinding} 的构造方法
+	 * @param type
+	 * @return
+	 */
 	private Constructor<?> findConstructorBindingAnnotatedConstructor(Class<?> type) {
 		if (isKotlinType(type)) {
 			Constructor<?> constructor = BeanUtils.findPrimaryConstructor(type);
@@ -59,9 +73,16 @@ class ConfigurationPropertiesBindConstructorProvider implements BindConstructorP
 				return findAnnotatedConstructor(type, constructor);
 			}
 		}
+		// 返回带有 ConstructorBinding 的构造方法
 		return findAnnotatedConstructor(type, type.getDeclaredConstructors());
 	}
 
+	/**
+	 * 返回带有 {@link ConstructorBinding} 的构造方法
+	 * @param type
+	 * @param candidates
+	 * @return
+	 */
 	private Constructor<?> findAnnotatedConstructor(Class<?> type, Constructor<?>... candidates) {
 		Constructor<?> constructor = null;
 		for (Constructor<?> candidate : candidates) {
@@ -76,11 +97,21 @@ class ConfigurationPropertiesBindConstructorProvider implements BindConstructorP
 		return constructor;
 	}
 
+	/**
+	 * 在类上看是否有 {@link ConstructorBinding @ConstructorBinding}
+	 * @param type
+	 * @return
+	 */
 	private boolean isConstructorBindingAnnotatedType(Class<?> type) {
 		return MergedAnnotations.from(type, MergedAnnotations.SearchStrategy.TYPE_HIERARCHY_AND_ENCLOSING_CLASSES)
 				.isPresent(ConstructorBinding.class);
 	}
 
+	/**
+	 * 若有唯一有入参的的构造方法，则返回
+	 * @param type
+	 * @return
+	 */
 	private Constructor<?> deduceBindConstructor(Class<?> type) {
 		if (isKotlinType(type)) {
 			return deducedKotlinBindConstructor(type);

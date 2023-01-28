@@ -25,10 +25,7 @@ import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Annotation for externalized configuration. Add this to a class definition or a
- * {@code @Bean} method in a {@code @Configuration} class if you want to bind and validate
- * some external Properties (e.g. from a .properties file).
- * <p>
+ * 为Bean绑定一些外部属性(例如，从. Properties文件中)，也可以将此添加到类定义或@Configuration类中的@Bean方法中。
  * Binding is either performed by calling setters on the annotated class or, if
  * {@link ConstructorBinding @ConstructorBinding} is in use, by binding to the constructor
  * parameters.
@@ -49,10 +46,7 @@ import org.springframework.core.annotation.AliasFor;
 public @interface ConfigurationProperties {
 
 	/**
-	 * The prefix of the properties that are valid to bind to this object. Synonym for
-	 * {@link #prefix()}. A valid prefix is defined by one or more words separated with
-	 * dots (e.g. {@code "acme.system.feature"}).
-	 * @return the prefix of the properties to bind
+	 * 可以绑定到此对象的有效属性的前缀。一个有效的前缀是由一个或多个用点分隔的单词定义的
 	 */
 	@AliasFor("prefix")
 	String value() default "";
@@ -67,17 +61,12 @@ public @interface ConfigurationProperties {
 	String prefix() default "";
 
 	/**
-	 * Flag to indicate that when binding to this object invalid fields should be ignored.
-	 * Invalid means invalid according to the binder that is used, and usually this means
-	 * fields of the wrong type (or that cannot be coerced into the correct type).
-	 * @return the flag value (default false)
+	 * 在绑定过程出现了错误，比如说字段类型错误，是否忽略
 	 */
 	boolean ignoreInvalidFields() default false;
 
 	/**
-	 * Flag to indicate that when binding to this object unknown fields should be ignored.
-	 * An unknown field could be a sign of a mistake in the Properties.
-	 * @return the flag value (default true)
+	 * 绑定过程中是否应该忽略未知字段。一个未知的字段可能是属性中出现错误的标志
 	 */
 	boolean ignoreUnknownFields() default true;
 

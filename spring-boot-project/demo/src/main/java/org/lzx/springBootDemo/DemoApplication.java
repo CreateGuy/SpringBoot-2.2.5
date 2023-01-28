@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServer;
 import org.springframework.context.ApplicationContext;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Inherited;
@@ -39,5 +41,11 @@ public class DemoApplication {
 		System.out.println(1);
 	}
 
+	@Bean
+	@ConditionalOnMissingBean
+	public InternalResourceViewResolver defaultViewResolver() {
+		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+		return resolver;
+	}
 }
 

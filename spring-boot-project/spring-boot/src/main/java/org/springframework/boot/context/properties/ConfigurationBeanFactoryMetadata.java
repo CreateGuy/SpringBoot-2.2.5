@@ -33,8 +33,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 
 /**
- * Utility class to memorize {@code @Bean} definition metadata during initialization of
- * the bean factory.
+ * 在bean工厂初始化期间记忆{@code @Bean}定义元数据的实用工具类。
  *
  * @author Dave Syer
  * @since 1.1.0
@@ -81,6 +80,10 @@ public class ConfigurationBeanFactoryMetadata implements ApplicationContextAware
 		this.applicationContext = (ConfigurableApplicationContext) applicationContext;
 	}
 
+	/**
+	 * 容器中没有 {@link ConfigurationBeanFactoryMetadata}，那就注册一个
+	 * @param registry
+	 */
 	static void register(BeanDefinitionRegistry registry) {
 		if (!registry.containsBeanDefinition(BEAN_NAME)) {
 			GenericBeanDefinition definition = new GenericBeanDefinition();

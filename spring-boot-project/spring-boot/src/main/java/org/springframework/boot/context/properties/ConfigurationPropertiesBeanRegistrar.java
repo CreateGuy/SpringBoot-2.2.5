@@ -54,17 +54,31 @@ final class ConfigurationPropertiesBeanRegistrar {
 	}
 
 	void register(Class<?> type, MergedAnnotation<ConfigurationProperties> annotation) {
+		// 获得Bean的名称
 		String name = getName(type, annotation);
+		// 没有在容器中的时候
 		if (!containsBeanDefinition(name)) {
+			// 注册Bean
 			registerBeanDefinition(name, type, annotation);
 		}
 	}
 
+	/**
+	 * 获得Bean的名称：以配置属性前缀 + 类名 作为Bena名称
+	 * @param type
+	 * @param annotation
+	 * @return
+	 */
 	private String getName(Class<?> type, MergedAnnotation<ConfigurationProperties> annotation) {
 		String prefix = annotation.isPresent() ? annotation.getString("prefix") : "";
 		return (StringUtils.hasText(prefix) ? prefix + "-" + type.getName() : type.getName());
 	}
 
+	/**
+	 * 容器中是否有指定Bean
+	 * @param name
+	 * @return
+	 */
 	private boolean containsBeanDefinition(String name) {
 		return containsBeanDefinition(this.beanFactory, name);
 	}
@@ -87,6 +101,12 @@ final class ConfigurationPropertiesBeanRegistrar {
 		this.registry.registerBeanDefinition(beanName, createBeanDefinition(beanName, type));
 	}
 
+	/**
+	 * 创建指定Bean对应的 {@link BeanDefinition}
+	 * @param beanName
+	 * @param type
+	 * @return
+	 */
 	private BeanDefinition createBeanDefinition(String beanName, Class<?> type) {
 		if (BindMethod.forType(type) == BindMethod.VALUE_OBJECT) {
 			return new ConfigurationPropertiesValueObjectBeanDefinition(this.beanFactory, beanName, type);

@@ -29,7 +29,7 @@ public class HelloController {
 
 	@GetMapping("hello1")
 	@ResponseBody
-	public String hello1() {
+	public String hello1(int i) {
 		return "hello1";
 	}
 }

@@ -28,6 +28,7 @@ import org.springframework.validation.DefaultMessageCodesResolver;
 
 /**
  * 有关SpringMvc的配置
+ * <p>一般情况下是由于 {@link org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter} 中使用了 {@link org.springframework.boot.context.properties.EnableConfigurationProperties @EnableConfigurationProperties} 直接注册成Bean 的</p>
  */
 @ConfigurationProperties(prefix = "spring.mvc")
 public class WebMvcProperties {
@@ -105,6 +106,9 @@ public class WebMvcProperties {
 	 */
 	private final View view = new View();
 
+	/**
+	 * 内容协商相关属性
+	 */
 	private final Contentnegotiation contentnegotiation = new Contentnegotiation();
 
 	/**
@@ -336,6 +340,9 @@ public class WebMvcProperties {
 
 	}
 
+	/**
+	 * 内容协商相关属性
+	 */
 	public static class Contentnegotiation {
 
 		/**

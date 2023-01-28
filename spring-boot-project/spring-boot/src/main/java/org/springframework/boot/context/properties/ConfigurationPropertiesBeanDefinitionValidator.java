@@ -47,6 +47,12 @@ class ConfigurationPropertiesBeanDefinitionValidator implements BeanFactoryPostP
 		}
 	}
 
+	/**
+	 * 是否是 {@link ConfigurationPropertiesValueObjectBeanDefinition}
+	 * @param beanFactory
+	 * @param beanName
+	 * @return
+	 */
 	private boolean isValueObjectBeanDefinition(ConfigurableListableBeanFactory beanFactory, String beanName) {
 		BeanDefinition definition = beanFactory.getBeanDefinition(beanName);
 		return (definition instanceof ConfigurationPropertiesValueObjectBeanDefinition);
@@ -57,6 +63,11 @@ class ConfigurationPropertiesBeanDefinitionValidator implements BeanFactoryPostP
 		return Ordered.LOWEST_PRECEDENCE;
 	}
 
+	/**
+	 * 验证
+	 * @param beanFactory
+	 * @param beanName
+	 */
 	private void validate(ConfigurableListableBeanFactory beanFactory, String beanName) {
 		try {
 			Class<?> beanClass = beanFactory.getType(beanName, false);
@@ -73,8 +84,7 @@ class ConfigurationPropertiesBeanDefinitionValidator implements BeanFactoryPostP
 	}
 
 	/**
-	 * Register a {@link ConfigurationPropertiesBeanDefinitionValidator} bean if one is
-	 * not already registered.
+	 * 如果容器中没有 {@link ConfigurationPropertiesBeanDefinitionValidator}，那就注册一个
 	 * @param registry the bean definition registry
 	 */
 	static void register(BeanDefinitionRegistry registry) {

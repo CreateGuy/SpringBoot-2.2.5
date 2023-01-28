@@ -27,6 +27,7 @@ import org.springframework.http.CacheControl;
 
 /**
  * 用于配置资源处理的属性
+ * <p>一般情况下是由于 {@link org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter} 中使用了{@link org.springframework.boot.context.properties.EnableConfigurationProperties @EnableConfigurationProperties} 直接注册成Bean 的</p>
  * @author Phillip Webb
  * @author Brian Clozel
  * @author Dave Syer
@@ -51,6 +52,9 @@ public class ResourceProperties {
 	 */
 	private boolean addMappings = true;
 
+	/**
+	 * Spring资源处理链的配置
+	 */
 	private final Chain chain = new Chain();
 
 	private final Cache cache = new Cache();
@@ -100,8 +104,7 @@ public class ResourceProperties {
 	public static class Chain {
 
 		/**
-		 * Whether to enable the Spring Resource Handling chain. By default, disabled
-		 * unless at least one strategy has been enabled.
+		 * 是否启用Spring Resource Handling链。默认情况下，禁用，除非至少有一个已启用策略
 		 */
 		private Boolean enabled;
 

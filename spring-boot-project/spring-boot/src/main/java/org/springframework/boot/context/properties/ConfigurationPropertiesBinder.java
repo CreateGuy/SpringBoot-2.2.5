@@ -176,6 +176,11 @@ class ConfigurationPropertiesBinder {
 		return null;
 	}
 
+	/**
+	 * 注册
+	 * <p>不懂，都找不到这两个类</p>
+	 * @param registry
+	 */
 	static void register(BeanDefinitionRegistry registry) {
 		if (!registry.containsBeanDefinition(FACTORY_BEAN_NAME)) {
 			GenericBeanDefinition definition = new GenericBeanDefinition();

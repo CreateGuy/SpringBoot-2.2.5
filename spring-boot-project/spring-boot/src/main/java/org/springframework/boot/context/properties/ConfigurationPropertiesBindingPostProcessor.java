@@ -31,28 +31,21 @@ import org.springframework.core.env.PropertySources;
 import org.springframework.util.Assert;
 
 /**
- * {@link BeanPostProcessor} to bind {@link PropertySources} to beans annotated with
- * {@link ConfigurationProperties @ConfigurationProperties}.
- *
- * @author Dave Syer
- * @author Phillip Webb
- * @author Christian Dupuis
- * @author Stephane Nicoll
- * @author Madhura Bhave
- * @since 1.0.0
+ * 是一个{@link BeanPostProcessor}，用于将
+ * {@link ConfigurationProperties @ConfigurationProperties} 带有的前缀绑定在Bean的属性上
+ * <p>注意：可能因为没有有参构造方法或者没有set方法而失效</p>
  */
 public class ConfigurationPropertiesBindingPostProcessor
 		implements BeanPostProcessor, PriorityOrdered, ApplicationContextAware, InitializingBean {
 
 	/**
-	 * The bean name that this post-processor is registered with.
+	 * 这个后处理程序注册的bean名称
 	 */
 	public static final String BEAN_NAME = ConfigurationPropertiesBindingPostProcessor.class.getName();
 
 	/**
-	 * The bean name of the configuration properties validator.
-	 * @deprecated since 2.2.0 in favor of
-	 * {@link EnableConfigurationProperties#VALIDATOR_BEAN_NAME}
+	 * 属性验证器的bean名称
+	 * <p>从 2.2.0 开始已经废弃，改用{@link EnableConfigurationProperties#VALIDATOR_BEAN_NAME}</p>
 	 */
 	@Deprecated
 	public static final String VALIDATOR_BEAN_NAME = EnableConfigurationProperties.VALIDATOR_BEAN_NAME;
@@ -91,12 +84,24 @@ public class ConfigurationPropertiesBindingPostProcessor
 		return Ordered.HIGHEST_PRECEDENCE + 1;
 	}
 
+	/**
+	 * 在Bean初始化前，看Bean是否带有 {@link ConfigurationProperties @ConfigurationProperties}，
+	 * 如果带有了从配置文件中读取属性然后复制到Bean上
+	 * @param bean
+	 * @param beanName
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		bind(ConfigurationPropertiesBean.get(this.applicationContext, bean, beanName));
 		return bean;
 	}
 
+	/**
+	 * 开始绑定
+	 * @param bean
+	 */
 	private void bind(ConfigurationPropertiesBean bean) {
 		if (bean == null || hasBoundValueObject(bean.getName())) {
 			return;
@@ -117,9 +122,8 @@ public class ConfigurationPropertiesBindingPostProcessor
 	}
 
 	/**
-	 * Register a {@link ConfigurationPropertiesBindingPostProcessor} bean if one is not
-	 * already registered.
-	 * @param registry the bean definition registry
+	 * 如果还没有 {@link ConfigurationPropertiesBindingPostProcessor} 那么就注册一个
+	 * @param registry Bean工厂
 	 * @since 2.2.0
 	 */
 	public static void register(BeanDefinitionRegistry registry) {
@@ -127,6 +131,7 @@ public class ConfigurationPropertiesBindingPostProcessor
 		if (!registry.containsBeanDefinition(BEAN_NAME)) {
 			GenericBeanDefinition definition = new GenericBeanDefinition();
 			definition.setBeanClass(ConfigurationPropertiesBindingPostProcessor.class);
+			// 标记为内部Bean，与用户无关
 			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			registry.registerBeanDefinition(BEAN_NAME, definition);
 		}

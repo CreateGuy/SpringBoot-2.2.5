@@ -59,14 +59,26 @@ import org.springframework.validation.annotation.Validated;
  */
 public final class ConfigurationPropertiesBean {
 
+	/**
+	 * Bean名称
+	 */
 	private final String name;
 
+	/**
+	 * Bean实例
+	 */
 	private final Object instance;
 
+	/**
+	 * 一般情况下是：从工厂方法，类本身，实例上获得有关@ConfigurationProperties的信息
+	 */
 	private final ConfigurationProperties annotation;
 
 	private final Bindable<?> bindTarget;
 
+	/**
+	 * 要绑定的方式
+	 */
 	private final BindMethod bindMethod;
 
 	private ConfigurationPropertiesBean(String name, Object instance, ConfigurationProperties annotation,
@@ -184,23 +196,21 @@ public final class ConfigurationPropertiesBean {
 	}
 
 	/**
-	 * Return a {@link ConfigurationPropertiesBean @ConfigurationPropertiesBean} instance
-	 * for the given bean details or {@code null} if the bean is not a
-	 * {@link ConfigurationProperties @ConfigurationProperties} object. Annotations are
-	 * considered both on the bean itself, as well as any factory method (for example a
-	 * {@link Bean @Bean} method).
-	 * @param applicationContext the source application context
-	 * @param bean the bean to consider
-	 * @param beanName the bean name
-	 * @return a configuration properties bean or {@code null} if the neither the bean or
-	 * factory method are annotated with
-	 * {@link ConfigurationProperties @ConfigurationProperties}
+	 * 对于给定的bean，返回一个 {@link ConfigurationPropertiesBean @ConfigurationPropertiesBean}实例，如果bean不是{@link ConfigurationPropertiesBean @ConfigurationPropertiesBean}对象，则返回null。
+	 * 在bean本身和任何工厂方法(例如@Bean方法)上都考虑
 	 */
 	public static ConfigurationPropertiesBean get(ApplicationContext applicationContext, Object bean, String beanName) {
+		// 找到工厂方法
 		Method factoryMethod = findFactoryMethod(applicationContext, beanName);
 		return create(beanName, bean, bean.getClass(), factoryMethod);
 	}
 
+	/**
+	 * 找到工厂方法
+	 * @param applicationContext
+	 * @param beanName
+	 * @return
+	 */
 	private static Method findFactoryMethod(ApplicationContext applicationContext, String beanName) {
 		if (applicationContext instanceof ConfigurableApplicationContext) {
 			return findFactoryMethod((ConfigurableApplicationContext) applicationContext, beanName);
@@ -208,36 +218,60 @@ public final class ConfigurationPropertiesBean {
 		return null;
 	}
 
+	/***
+	 * 找到工厂方法
+	 * @param applicationContext
+	 * @param beanName
+	 * @return
+	 */
 	private static Method findFactoryMethod(ConfigurableApplicationContext applicationContext, String beanName) {
 		return findFactoryMethod(applicationContext.getBeanFactory(), beanName);
 	}
 
+	/**
+	 * 通过自省或者反射找到工厂方法
+	 * @param beanFactory
+	 * @param beanName
+	 * @return
+	 */
 	private static Method findFactoryMethod(ConfigurableListableBeanFactory beanFactory, String beanName) {
 		if (beanFactory.containsBeanDefinition(beanName)) {
 			BeanDefinition beanDefinition = beanFactory.getMergedBeanDefinition(beanName);
 			if (beanDefinition instanceof RootBeanDefinition) {
+				// 反省方式
 				Method resolvedFactoryMethod = ((RootBeanDefinition) beanDefinition).getResolvedFactoryMethod();
 				if (resolvedFactoryMethod != null) {
 					return resolvedFactoryMethod;
 				}
 			}
+			// 反射方式
 			return findFactoryMethodUsingReflection(beanFactory, beanDefinition);
 		}
 		return null;
 	}
 
+	/**
+	 * 通过反射获得工厂方法
+	 * @param beanFactory
+	 * @param beanDefinition
+	 * @return
+	 */
 	private static Method findFactoryMethodUsingReflection(ConfigurableListableBeanFactory beanFactory,
 			BeanDefinition beanDefinition) {
+		// 获得工厂方法
 		String factoryMethodName = beanDefinition.getFactoryMethodName();
+		// 获得包含工厂方法的外部Bean名称
 		String factoryBeanName = beanDefinition.getFactoryBeanName();
 		if (factoryMethodName == null || factoryBeanName == null) {
 			return null;
 		}
 		Class<?> factoryType = beanFactory.getType(factoryBeanName);
+		// 如果是Cglib，获取其父类，也就是要代理的类
 		if (factoryType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
 			factoryType = factoryType.getSuperclass();
 		}
 		AtomicReference<Method> factoryMethod = new AtomicReference<>();
+		// 遍历外部类的所有方法，找到工厂方法
 		ReflectionUtils.doWithMethods(factoryType, (method) -> {
 			if (method.getName().equals(factoryMethodName)) {
 				factoryMethod.set(method);
@@ -254,14 +288,18 @@ public final class ConfigurationPropertiesBean {
 	}
 
 	private static ConfigurationPropertiesBean create(String name, Object instance, Class<?> type, Method factory) {
+		// 从工厂方法，类本身，实例上获得有关@ConfigurationProperties的信息
 		ConfigurationProperties annotation = findAnnotation(instance, type, factory, ConfigurationProperties.class);
 		if (annotation == null) {
 			return null;
 		}
+		// 从工厂方法，类本身，实例上获得有关@Validated的信息
 		Validated validated = findAnnotation(instance, type, factory, Validated.class);
 		Annotation[] annotations = (validated != null) ? new Annotation[] { annotation, validated }
 				: new Annotation[] { annotation };
-		ResolvableType bindType = (factory != null) ? ResolvableType.forMethodReturnType(factory)
+		// 获得泛型的情况
+		ResolvableType bindType = (factory != null)
+				? ResolvableType.forMethodReturnType(factory)
 				: ResolvableType.forClass(type);
 		Bindable<Object> bindTarget = Bindable.of(bindType).withAnnotations(annotations);
 		if (instance != null) {
@@ -270,15 +308,30 @@ public final class ConfigurationPropertiesBean {
 		return new ConfigurationPropertiesBean(name, instance, annotation, bindTarget);
 	}
 
+	/**
+	 * 从工厂方法，类本身，实例上获得有关指定注解的信息
+	 * @param instance
+	 * @param type
+	 * @param factory
+	 * @param annotationType
+	 * @param <A>
+	 * @return
+	 */
 	private static <A extends Annotation> A findAnnotation(Object instance, Class<?> type, Method factory,
 			Class<A> annotationType) {
 		MergedAnnotation<A> annotation = MergedAnnotation.missing();
+
+		// 工厂方法上
 		if (factory != null) {
 			annotation = findMergedAnnotation(factory, annotationType);
 		}
+
+		// 类上
 		if (!annotation.isPresent()) {
 			annotation = findMergedAnnotation(type, annotationType);
 		}
+
+		// 如果是Aop代理，那就从代理上看
 		if (!annotation.isPresent() && AopUtils.isAopProxy(instance)) {
 			annotation = MergedAnnotations.from(AopUtils.getTargetClass(instance), SearchStrategy.TYPE_HIERARCHY)
 					.get(annotationType);
@@ -293,20 +346,25 @@ public final class ConfigurationPropertiesBean {
 	}
 
 	/**
-	 * The binding method that is used for the bean.
+	 * 用于bean的绑定方法
 	 */
 	public enum BindMethod {
 
 		/**
-		 * Java Bean using getter/setter binding.
+		 * 使用getter/setter绑定的Java Bean
 		 */
 		JAVA_BEAN,
 
 		/**
-		 * Value object using constructor binding.
+		 * 值对象使用构造函数绑定
 		 */
 		VALUE_OBJECT;
 
+		/**
+		 * 是否使用了构造方法设置属性
+		 * @param type
+		 * @return
+		 */
 		static BindMethod forType(Class<?> type) {
 			return (ConfigurationPropertiesBindConstructorProvider.INSTANCE.getBindConstructor(type, false) != null)
 					? VALUE_OBJECT : JAVA_BEAN;
