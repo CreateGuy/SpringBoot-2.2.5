@@ -40,12 +40,13 @@ import org.springframework.core.annotation.Order;
 @Documented
 public @interface AutoConfigureOrder {
 
+	/**
+	 * 默认值是意思是这个自动配置类在最后初始化
+	 */
 	int DEFAULT_ORDER = 0;
 
 	/**
-	 * The order value. Default is {@code 0}.
-	 * @see Ordered#getOrder()
-	 * @return the order value
+	 * 当前自动配置类的初始化顺序
 	 */
 	int value() default DEFAULT_ORDER;
 
