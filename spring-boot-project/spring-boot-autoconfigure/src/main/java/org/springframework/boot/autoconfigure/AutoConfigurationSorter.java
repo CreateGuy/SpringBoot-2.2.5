@@ -84,17 +84,20 @@ class AutoConfigurationSorter {
 	/**
 	 * 利用配置文件和自动配置类中的 {@link AutoConfigureBefore @AutoConfigureBefore} 和 {@link AutoConfigureAfter @AutoConfigureAfter}，对自动配置类进行排序
 	 * @param classes
-	 * @param classNames
+	 * @param classNames 自动配置类
 	 * @return
 	 */
 	private List<String> sortByAnnotation(AutoConfigurationClasses classes, List<String> classNames) {
 		List<String> toSort = new ArrayList<>(classNames);
+		// 不懂为什么要重复加一次，两个都是一样的自动配置类
 		toSort.addAll(classes.getAllNames());
 		Set<String> sorted = new LinkedHashSet<>();
 		Set<String> processing = new LinkedHashSet<>();
+		// 开始排序
 		while (!toSort.isEmpty()) {
 			doSortByAfterAnnotation(classes, toSort, sorted, processing, null);
 		}
+		// 只留下
 		sorted.retainAll(classNames);
 		return new ArrayList<>(sorted);
 	}
@@ -106,7 +109,7 @@ class AutoConfigurationSorter {
 	 * @param toSort 要排序的自动配置类
 	 * @param sorted 最终排序好的自动配置类集合
 	 * @param processing 处理过排序的自动配置类集合
-	 * @param current
+	 * @param current 当前处理的自动配置类
 	 */
 	private void doSortByAfterAnnotation(AutoConfigurationClasses classes, List<String> toSort, Set<String> sorted,
 			Set<String> processing, String current) {
@@ -114,7 +117,7 @@ class AutoConfigurationSorter {
 			current = toSort.remove(0);
 		}
 		processing.add(current);
-		// 拿到要在此自动配置类之前初始化的自动配置类
+		// 遍历应该在当前自动配置类之前初始化的自动配置类名称
 		for (String after : classes.getClassesRequestedAfter(current)) {
 			Assert.state(!processing.contains(after),
 					"AutoConfigure cycle detected between " + current + " and " + after);
@@ -130,6 +133,9 @@ class AutoConfigurationSorter {
 		sorted.add(current);
 	}
 
+	/**
+	 * 包含了所有符合条件的自动配置类
+	 */
 	private static class AutoConfigurationClasses {
 
 		/**
@@ -181,8 +187,15 @@ class AutoConfigurationSorter {
 			return this.classes.get(className);
 		}
 
+		/**
+		 * 返回应该在当前自动配置类之前初始化的自动配置类名称
+		 * @param className 当前自动配置类
+		 * @return
+		 */
 		Set<String> getClassesRequestedAfter(String className) {
+			// 先拿到当前自动配置类自己设置的要在什么自动配置类后面初始化
 			Set<String> classesRequestedAfter = new LinkedHashSet<>(get(className).getAfter());
+			// 再看其他自动配置类有没有要求在当前自动配置类初始化之前初始化
 			this.classes.forEach((name, autoConfigurationClass) -> {
 				if (autoConfigurationClass.getBefore().contains(className)) {
 					classesRequestedAfter.add(name);
@@ -220,13 +233,13 @@ class AutoConfigurationSorter {
 		private volatile AnnotationMetadata annotationMetadata;
 
 		/**
-		 * 当前自动配置类的应该在什么自动配置类前初始化
+		 * 当前自动配置类的应该在什么自动配置类之前初始化
 		 * <li>可能是配置文件中的值，也有可能是自动配置类上的 {@link AutoConfigureBefore}的值</li>
 		 */
 		private volatile Set<String> before;
 
 		/**
-		 * 当前自动配置类的应该在什么自动配置类前初始化
+		 * 当前自动配置类的应该在什么自动配置类之后初始化
 		 * <li>可能是配置文件中的值，也有可能是自动配置类上的 {@link AutoConfigureAfter}的值</li>
 		 */
 		private volatile Set<String> after;

@@ -89,6 +89,11 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	private ResourceLoader resourceLoader;
 
+	/**
+	 * 返回过滤过的自动配置类
+	 * @param annotationMetadata
+	 * @return
+	 */
 	@Override
 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
 		if (!isEnabled(annotationMetadata)) {
@@ -96,13 +101,14 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		}
 		AutoConfigurationMetadata autoConfigurationMetadata = AutoConfigurationMetadataLoader
 				.loadMetadata(this.beanClassLoader);
+		// 获得所有自动配置类
 		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(autoConfigurationMetadata,
 				annotationMetadata);
 		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
 	}
 
 	/**
-	 * 对自动配置类进行过滤
+	 * 返回所有自动配置类
 	 * @param autoConfigurationMetadata 导入类(默认是启动类)的注解元数据
 	 * @param annotationMetadata 所有的自动配置类
 	 * @return 符合条件的自动配置类
@@ -151,7 +157,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	}
 
 	/**
-	 * 获得导入类上有关@EnableAutoConfiguration的属性，不能获取注解内部的注解
+	 * 获得导入类上有关 {@link EnableAutoConfiguration @EnableAutoConfiguration} 的属性，不能获取注解内部的注解
 	 * @param metadata 导入类
 	 * @return
 	 */
