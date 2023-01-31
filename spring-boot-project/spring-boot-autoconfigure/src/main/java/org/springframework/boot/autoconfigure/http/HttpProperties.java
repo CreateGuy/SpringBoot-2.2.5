@@ -24,24 +24,19 @@ import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * HTTP properties.
- *
- * @author Phillip Webb
- * @author Stephane Nicoll
- * @author Brian Clozel
- * @since 2.1.0
+ * HTTP配置文件
  */
 @ConfigurationProperties(prefix = "spring.http")
 public class HttpProperties {
 
 	/**
-	 * Whether logging of (potentially sensitive) request details at DEBUG and TRACE level
-	 * is allowed.
+	 * 是否允许在 DEBUG 和 TRACE 级别记录(可能敏感的)请求详细信息
 	 */
 	private boolean logRequestDetails;
 
 	/**
-	 * HTTP encoding properties.
+	 * HTTP的编码格式
+	 * <p>比如说在 {@link HttpMessageConvertersAutoConfiguration} 中会用到</p>
 	 */
 	private final Encoding encoding = new Encoding();
 
@@ -58,37 +53,34 @@ public class HttpProperties {
 	}
 
 	/**
-	 * Configuration properties for http encoding.
+	 * http编码的配置属性
 	 */
 	public static class Encoding {
 
 		public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
 		/**
-		 * Charset of HTTP requests and responses. Added to the "Content-Type" header if
-		 * not set explicitly.
+		 * HTTP请求和响应的字符集。如果没有显式设置，则添加到“Content-Type”标头
 		 */
 		private Charset charset = DEFAULT_CHARSET;
 
 		/**
-		 * Whether to force the encoding to the configured charset on HTTP requests and
-		 * responses.
+		 * 是否强制请求和响应使用配置的字符集(优先级在下面两个之下)
 		 */
 		private Boolean force;
 
 		/**
-		 * Whether to force the encoding to the configured charset on HTTP requests.
-		 * Defaults to true when "force" has not been specified.
+		 * 是否强制请求使用配置的字符集
 		 */
 		private Boolean forceRequest;
 
 		/**
-		 * Whether to force the encoding to the configured charset on HTTP responses.
+		 * 是否强制响应使用配置的字符集
 		 */
 		private Boolean forceResponse;
 
 		/**
-		 * Locale in which to encode mapping.
+		 * 用于编码映射的区域设置
 		 */
 		private Map<Locale, Charset> mapping;
 
@@ -132,6 +124,11 @@ public class HttpProperties {
 			this.mapping = mapping;
 		}
 
+		/**
+		 * 是否强制使用配置的字符集
+		 * @param type
+		 * @return
+		 */
 		public boolean shouldForce(Type type) {
 			Boolean force = (type != Type.REQUEST) ? this.forceResponse : this.forceRequest;
 			if (force == null) {

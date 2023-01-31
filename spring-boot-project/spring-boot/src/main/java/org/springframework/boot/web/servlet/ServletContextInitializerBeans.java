@@ -66,24 +66,48 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 	private static final Log logger = LogFactory.getLog(ServletContextInitializerBeans.class);
 
 	/**
-	 * Seen bean instances or bean names.
+	 * 见过的Bean
 	 */
 	private final Set<Object> seen = new HashSet<>();
 
+	/**
+	 * 初始化程序
+	 * <p> 比如说是 {@link Servlet} 和对应的 {@link ServletContextInitializer} 的映射关系</p>
+	 */
 	private final MultiValueMap<Class<?>, ServletContextInitializer> initializers;
 
+	/**
+	 * 初始化程序
+	 */
 	private final List<Class<? extends ServletContextInitializer>> initializerTypes;
 
+	/**
+	 * 已经排好了序的初始化程序
+	 */
 	private List<ServletContextInitializer> sortedList;
 
 	@SafeVarargs
 	public ServletContextInitializerBeans(ListableBeanFactory beanFactory,
 			Class<? extends ServletContextInitializer>... initializerTypes) {
 		this.initializers = new LinkedMultiValueMap<>();
+		// 指定初始化程序类型
 		this.initializerTypes = (initializerTypes.length != 0) ? Arrays.asList(initializerTypes)
 				: Collections.singletonList(ServletContextInitializer.class);
+
+		// 添加指定类型的初始化程序
 		addServletContextInitializerBeans(beanFactory);
+		// 先获取指定类型的Bean，然后适配为初始化程序，然后注册
 		addAdaptableBeans(beanFactory);
+
+		/*
+			扁平化：initializers的value可能是一个LinkedList
+			最终是下面这种情况下：
+				characterEncodingFilter
+				formContentFilter
+				requestContextFilter
+				springSecurityFilterChain：这是导入了SpringSecurity才有的
+				dispatcherServlet
+		 */
 		List<ServletContextInitializer> sortedInitializers = this.initializers.values().stream()
 				.flatMap((value) -> value.stream().sorted(AnnotationAwareOrderComparator.INSTANCE))
 				.collect(Collectors.toList());
@@ -91,15 +115,28 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		logMappings(this.initializers);
 	}
 
+	/**
+	 * 添加指定类型的初始化程序
+	 * @param beanFactory
+	 */
 	private void addServletContextInitializerBeans(ListableBeanFactory beanFactory) {
 		for (Class<? extends ServletContextInitializer> initializerType : this.initializerTypes) {
+			// 从容器中读取指定的初始化程序，然后注册
+			// 一般情况下只有 DispatcherServletRegistrationBean，如果导入了SpringSecurity还会有 DelegatingFilterProxyRegistrationBean
 			for (Entry<String, ? extends ServletContextInitializer> initializerBean : getOrderedBeansOfType(beanFactory,
 					initializerType)) {
+				// 注册初始化程序
 				addServletContextInitializerBean(initializerBean.getKey(), initializerBean.getValue(), beanFactory);
 			}
 		}
 	}
 
+	/**
+	 * 注册初始化程序
+	 * @param beanName
+	 * @param initializer
+	 * @param beanFactory
+	 */
 	private void addServletContextInitializerBean(String beanName, ServletContextInitializer initializer,
 			ListableBeanFactory beanFactory) {
 		if (initializer instanceof ServletRegistrationBean) {
@@ -124,6 +161,14 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		}
 	}
 
+	/**
+	 * 注册初始化程序
+	 * @param type
+	 * @param beanName
+	 * @param initializer
+	 * @param beanFactory
+	 * @param source
+	 */
 	private void addServletContextInitializerBean(Class<?> type, String beanName, ServletContextInitializer initializer,
 			ListableBeanFactory beanFactory, Object source) {
 		this.initializers.add(type, initializer);
@@ -147,11 +192,18 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		return "unknown";
 	}
 
+	/**
+	 * 先获取指定类型的Bean，然后适配为初始化程序，然后注册
+	 * @param beanFactory
+	 */
 	@SuppressWarnings("unchecked")
 	protected void addAdaptableBeans(ListableBeanFactory beanFactory) {
 		MultipartConfigElement multipartConfig = getMultipartConfig(beanFactory);
+		// 注册 Servlet 的初始化程序
 		addAsRegistrationBean(beanFactory, Servlet.class, new ServletRegistrationBeanAdapter(multipartConfig));
+		// 注册 Filter 的初始化程序
 		addAsRegistrationBean(beanFactory, Filter.class, new FilterRegistrationBeanAdapter());
+		// 注册 EventListener 的初始化程序
 		for (Class<?> listenerType : ServletListenerRegistrationBean.getSupportedTypes()) {
 			addAsRegistrationBean(beanFactory, EventListener.class, (Class<EventListener>) listenerType,
 					new ServletListenerRegistrationBeanAdapter());
@@ -164,11 +216,27 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		return beans.isEmpty() ? null : beans.get(0).getValue();
 	}
 
+	/**
+	 * 注册指定初始化程序
+	 * @param beanFactory
+	 * @param type
+	 * @param adapter
+	 * @param <T>
+	 */
 	protected <T> void addAsRegistrationBean(ListableBeanFactory beanFactory, Class<T> type,
 			RegistrationBeanAdapter<T> adapter) {
 		addAsRegistrationBean(beanFactory, type, type, adapter);
 	}
 
+	/**
+	 * 将指定类型的Bean包装为 {@link RegistrationBean}，并注册
+	 * @param beanFactory
+	 * @param type
+	 * @param beanType
+	 * @param adapter
+	 * @param <T>
+	 * @param <B>
+	 */
 	private <T, B extends T> void addAsRegistrationBean(ListableBeanFactory beanFactory, Class<T> type,
 			Class<B> beanType, RegistrationBeanAdapter<T> adapter) {
 		List<Map.Entry<String, B>> entries = getOrderedBeansOfType(beanFactory, beanType, this.seen);
@@ -198,14 +266,31 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		}.getOrder(value);
 	}
 
+	/**
+	 * 从容器中读取指定类型的Bean
+	 * @param beanFactory
+	 * @param type
+	 * @param <T>
+	 * @return
+	 */
 	private <T> List<Entry<String, T>> getOrderedBeansOfType(ListableBeanFactory beanFactory, Class<T> type) {
 		return getOrderedBeansOfType(beanFactory, type, Collections.emptySet());
 	}
 
+	/**
+	 * 从容器中读取指定类型的Bean
+	 * @param beanFactory
+	 * @param type
+	 * @param excludes 需要过滤的Bean
+	 * @param <T>
+	 * @return
+	 */
 	private <T> List<Entry<String, T>> getOrderedBeansOfType(ListableBeanFactory beanFactory, Class<T> type,
 			Set<?> excludes) {
+		// 获得指定类型的Bean
 		String[] names = beanFactory.getBeanNamesForType(type, true, false);
 		Map<String, T> map = new LinkedHashMap<>();
+		// 过滤Bean
 		for (String name : names) {
 			if (!excludes.contains(name) && !ScopedProxyUtils.isScopedTarget(name)) {
 				T bean = beanFactory.getBean(name, type);
@@ -215,6 +300,7 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 			}
 		}
 		List<Entry<String, T>> beans = new ArrayList<>(map.entrySet());
+		// 排序
 		beans.sort((o1, o2) -> AnnotationAwareOrderComparator.INSTANCE.compare(o1.getValue(), o2.getValue()));
 		return beans;
 	}
@@ -235,6 +321,10 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		logger.debug("Mapping " + name + ": " + info);
 	}
 
+	/**
+	 * 返回需要注册到Tomcat的初始化程序
+	 * @return
+	 */
 	@Override
 	public Iterator<ServletContextInitializer> iterator() {
 		return this.sortedList.iterator();

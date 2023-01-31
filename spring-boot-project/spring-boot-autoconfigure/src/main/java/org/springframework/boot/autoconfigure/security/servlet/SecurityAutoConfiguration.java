@@ -22,20 +22,19 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.security.SecurityDataConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 
 /**
- * {@link EnableAutoConfiguration Auto-configuration} for Spring Security.
- *
- * @author Dave Syer
- * @author Andy Wilkinson
- * @author Madhura Bhave
- * @since 1.0.0
+ * 通过 {@link EnableAutoConfiguration Auto-configuration} 导入的SpringSecurity中最重要的一个自动配置类
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(DefaultAuthenticationEventPublisher.class)
@@ -47,6 +46,7 @@ public class SecurityAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean(AuthenticationEventPublisher.class)
 	public DefaultAuthenticationEventPublisher authenticationEventPublisher(ApplicationEventPublisher publisher) {
+		publisher.publishEvent(new ContextRefreshedEvent((ApplicationContext) publisher));
 		return new DefaultAuthenticationEventPublisher(publisher);
 	}
 

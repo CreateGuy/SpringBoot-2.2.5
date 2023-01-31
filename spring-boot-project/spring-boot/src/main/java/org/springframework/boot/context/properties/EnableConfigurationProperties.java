@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 /**
- * 启用 {@link ConfigurationProperties @ConfigurationProperties} 的支持，并且可以指定类
+ * 启用 {@link ConfigurationProperties @ConfigurationProperties} 的支持，并且可以快速注册配置类
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

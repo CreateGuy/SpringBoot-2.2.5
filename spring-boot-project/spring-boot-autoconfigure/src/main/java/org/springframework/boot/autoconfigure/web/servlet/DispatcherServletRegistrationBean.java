@@ -23,6 +23,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.servlet.DispatcherServlet;
 
 /**
+ * 是提供给 Tomcat 那边的
  * {@link ServletRegistrationBean} for the auto-configured {@link DispatcherServlet}. Both
  * registers the servlet and exposes {@link DispatcherServletPath} information.
  *
