@@ -56,6 +56,10 @@ public class DelegatingFilterProxyRegistrationBean extends AbstractFilterRegistr
 
 	private ApplicationContext applicationContext;
 
+	/**
+	 * Bean在容器中的名称
+	 * <p>是在 {@link ServletContextInitializerBeans} 中调用</p>
+	 */
 	private final String targetBeanName;
 
 	/**

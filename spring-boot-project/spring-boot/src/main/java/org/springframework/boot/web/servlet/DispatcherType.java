@@ -17,37 +17,38 @@
 package org.springframework.boot.web.servlet;
 
 /**
- * Enumeration of filter dispatcher types, identical to
- * {@link javax.servlet.DispatcherType} and used in configuration as the servlet API may
- * not be present.
- *
- * @author Stephane Nicoll
- * @since 2.0.0
+ * 派发类型
+ * <ul>
+ *      <li>比如说将某个过滤器的派发类型设置为 forward，那么只有在内部使用request.getRequestDispatcher("/").forward(request,response);，才会执行此过滤器</li>
+ *      <li>详情见：{@link org.apache.catalina.core.ApplicationFilterFactory#matchDispatcher(FilterMap, javax.servlet.DispatcherType)}</li>
+ * </ul>
+
  */
 public enum DispatcherType {
 
 	/**
-	 * Apply the filter on "RequestDispatcher.forward()" calls.
+	 * 在 "RequestDispatcher.forward()" 的情况下才调用此过滤器
 	 */
 	FORWARD,
 
 	/**
-	 * Apply the filter on "RequestDispatcher.include()" calls.
+	 * 在 "RequestDispatcher.inclue()" 的情况下才调用此过滤器
 	 */
 	INCLUDE,
 
 	/**
-	 * Apply the filter on ordinary client calls.
+	 * 正常的请求下调用此过滤器
 	 */
 	REQUEST,
 
 	/**
-	 * Apply the filter under calls dispatched from an AsyncContext.
+	 * 从 {@link javax.servlet.AsyncContext} 的分派的调用下此过滤器
+	 * <p>比如说通过 {@link org.springframework.web.context.request.async.WebAsyncManager} 开启异步任务</p>
 	 */
 	ASYNC,
 
 	/**
-	 * Apply the filter when an error is handled.
+	 * 估计是出现了错误的情况下才调用此过滤器
 	 */
 	ERROR
 

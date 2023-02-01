@@ -41,29 +41,33 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.util.StringUtils;
 
 /**
- * 是一个自动配置类，所以他是通过spring.factories+spring-autoconfigure-metadata.properties出来的
- * 主要是为容器中注册一个基于内存的UserDetailsManager
+ * 是一个自动配置类，他是通过spring.factories + spring-autoconfigure-metadata.properties 出来的
+ * 主要是为容器中注册一个基于内存的 {@link InMemoryUserDetailsManager}
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(AuthenticationManager.class)
 @ConditionalOnBean(ObjectPostProcessor.class)
 @ConditionalOnMissingBean(
+		// 要求没这三个的原因我估计是因为，如果有了这三个的话，就已经不需要内存的用户的了
 		value = { AuthenticationManager.class, AuthenticationProvider.class, UserDetailsService.class },
 		type = { "org.springframework.security.oauth2.jwt.JwtDecoder",
 				"org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector" })
 public class UserDetailsServiceAutoConfiguration {
 
 	/**
-	 * 密码格式以{noop}开头
+	 * 密码格式以 {noop} 开头
 	 */
 	private static final String NOOP_PASSWORD_PREFIX = "{noop}";
 
+	/**
+	 * 检查密码是否是默认格式的表达式
+	 */
 	private static final Pattern PASSWORD_ALGORITHM_PATTERN = Pattern.compile("^\\{.+}.*$");
 
 	private static final Log logger = LogFactory.getLog(UserDetailsServiceAutoConfiguration.class);
 
 	/**
-	 * 为容器中注入一个InMemoryUserDetailsManager
+	 * 为容器中注入一个 {@link InMemoryUserDetailsManager}
 	 * @param properties
 	 * @param passwordEncoder
 	 * @return
@@ -81,14 +85,22 @@ public class UserDetailsServiceAutoConfiguration {
 						.roles(StringUtils.toStringArray(roles)).build());
 	}
 
+	/**
+	 * 返回带有格式的密码
+	 * @param user
+	 * @param encoder
+	 * @return
+	 */
 	private String getOrDeducePassword(SecurityProperties.User user, PasswordEncoder encoder) {
 		String password = user.getPassword();
 		if (user.isPasswordGenerated()) {
 			logger.info(String.format("%n%nUsing generated security password: %s%n", user.getPassword()));
 		}
+		// 是否带有格式
 		if (encoder != null || PASSWORD_ALGORITHM_PATTERN.matcher(password).matches()) {
 			return password;
 		}
+		// 加上指定前缀
 		return NOOP_PASSWORD_PREFIX + password;
 	}
 

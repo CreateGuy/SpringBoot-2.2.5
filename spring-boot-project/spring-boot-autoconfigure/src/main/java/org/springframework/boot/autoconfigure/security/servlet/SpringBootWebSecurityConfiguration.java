@@ -26,14 +26,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
- * The default configuration for web security. It relies on Spring Security's
- * content-negotiation strategy to determine what sort of authentication to use. If the
- * user specifies their own {@link WebSecurityConfigurerAdapter}, this will back-off
- * completely and the users should specify all the bits that they want to configure as
- * part of the custom security configuration.
- *
- * @author Madhura Bhave
- * @since 2.0.0
+ * 如果说用户没有配置，也就是没有使用 {@link WebSecurityConfigurerAdapter}, 那就启用默认配置
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(WebSecurityConfigurerAdapter.class)

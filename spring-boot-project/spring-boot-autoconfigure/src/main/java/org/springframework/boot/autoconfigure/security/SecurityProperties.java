@@ -30,21 +30,14 @@ import org.springframework.core.Ordered;
 import org.springframework.util.StringUtils;
 
 /**
- * Configuration properties for Spring Security.
- *
- * @author Dave Syer
- * @author Andy Wilkinson
- * @author Madhura Bhave
- * @since 1.0.0
+ * SpringSecurity 的属性
  */
 @ConfigurationProperties(prefix = "spring.security")
 public class SecurityProperties {
 
 	/**
-	 * Order applied to the WebSecurityConfigurerAdapter that is used to configure basic
-	 * authentication for application endpoints. If you want to add your own
-	 * authentication for all or some of those endpoints the best thing to do is to add
-	 * your own WebSecurityConfigurerAdapter with lower order.
+	 * 默认的 {@link org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter} 的初始化顺序
+	 * <li>这里的默认指的是系统配置的</li>
 	 */
 	public static final int BASIC_AUTH_ORDER = Ordered.LOWEST_PRECEDENCE - 5;
 
@@ -55,14 +48,18 @@ public class SecurityProperties {
 	public static final int IGNORED_ORDER = Ordered.HIGHEST_PRECEDENCE;
 
 	/**
-	 * Default order of Spring Security's Filter in the servlet container (i.e. amongst
-	 * other filters registered with the container). There is no connection between this
-	 * and the {@code @Order} on a WebSecurityConfigurer.
+	 * springSecurityFilterChain 在 Servlet 容器中的默认顺序(即在容器中注册的其他过滤器之间的顺序)
 	 */
 	public static final int DEFAULT_FILTER_ORDER = OrderedFilter.REQUEST_WRAPPER_FILTER_MAX_ORDER - 100;
 
+	/**
+	 * springSecurityFilterChain 的属性
+	 */
 	private final Filter filter = new Filter();
 
+	/**
+	 * 基于内存的用户
+	 */
 	private User user = new User();
 
 	public User getUser() {
@@ -73,15 +70,18 @@ public class SecurityProperties {
 		return this.filter;
 	}
 
+	/**
+	 * 配置 springSecurityFilterChain 的属性
+	 */
 	public static class Filter {
 
 		/**
-		 * Security filter chain order.
+		 * springSecurityFilterChain 在 Servlet 容器中的默认顺序(即在容器中注册的其他过滤器之间的顺序)
 		 */
 		private int order = DEFAULT_FILTER_ORDER;
 
 		/**
-		 * Security filter chain dispatcher types.
+		 * 此过滤器支持的派发类型
 		 */
 		private Set<DispatcherType> dispatcherTypes = new HashSet<>(
 				Arrays.asList(DispatcherType.ASYNC, DispatcherType.ERROR, DispatcherType.REQUEST));
@@ -104,23 +104,29 @@ public class SecurityProperties {
 
 	}
 
+	/**
+	 * 基于配置文件的内存用户
+	 */
 	public static class User {
 
 		/**
-		 * Default user name.
+		 * 用户名
 		 */
 		private String name = "user";
 
 		/**
-		 * Password for the default user name.
+		 * 密码
 		 */
 		private String password = UUID.randomUUID().toString();
 
 		/**
-		 * Granted roles for the default user name.
+		 * 用户角色
 		 */
 		private List<String> roles = new ArrayList<>();
 
+		/**
+		 * 是否使用随机生成的密码
+		 */
 		private boolean passwordGenerated = true;
 
 		public String getName() {
@@ -135,6 +141,11 @@ public class SecurityProperties {
 			return this.password;
 		}
 
+		/**
+		 * 设置密码
+		 * <li>配置文件的原理貌似就是调用set方法</li>
+		 * @param password
+		 */
 		public void setPassword(String password) {
 			if (!StringUtils.hasLength(password)) {
 				return;

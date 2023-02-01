@@ -37,10 +37,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 
 /**
- * {@link EnableAutoConfiguration Auto-configuration} for Spring Security's Filter.
- * Configured separately from {@link SpringBootWebSecurityConfiguration} to ensure that
+ * SpringSecurity的 {@link EnableAutoConfiguration Auto-configuration}
+  <p>Configured separately from {@link SpringBootWebSecurityConfiguration} to ensure that
  * the filter's order is still configured when a user-provided
- * {@link WebSecurityConfiguration} exists.
+ * {@link WebSecurityConfiguration} exists.</p>
  *
  * @author Rob Winch
  * @author Phillip Webb
@@ -56,6 +56,11 @@ public class SecurityFilterAutoConfiguration {
 
 	private static final String DEFAULT_FILTER_NAME = AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME;
 
+	/**
+	 * 为了将配置好的 springSecurityFilterChain，注册到Tomcat的容器中
+	 * @param securityProperties
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnBean(name = DEFAULT_FILTER_NAME)
 	public DelegatingFilterProxyRegistrationBean securityFilterChainRegistration(

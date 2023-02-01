@@ -43,10 +43,15 @@ import org.springframework.security.authentication.DefaultAuthenticationEventPub
 		SecurityDataConfiguration.class })
 public class SecurityAutoConfiguration {
 
+	/**
+	 * 注册一个 {@link DefaultAuthenticationEventPublisher}
+	 * <li>是为了在认证成功或者失败的时候能够发布对于的事件</li>
+	 * @param publisher
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(AuthenticationEventPublisher.class)
 	public DefaultAuthenticationEventPublisher authenticationEventPublisher(ApplicationEventPublisher publisher) {
-		publisher.publishEvent(new ContextRefreshedEvent((ApplicationContext) publisher));
 		return new DefaultAuthenticationEventPublisher(publisher);
 	}
 

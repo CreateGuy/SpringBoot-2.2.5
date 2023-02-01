@@ -23,10 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 
 /**
- * Automatically adds Spring Security's integration with Spring Data.
- *
- * @author Rob Winch
- * @since 1.3.0
+ * 自动添加Spring Security与Spring Data的集成
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(SecurityEvaluationContextExtension.class)

@@ -33,7 +33,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 
 /**
- * 在bean工厂初始化期间记忆{@code @Bean}定义元数据的实用工具类。
+ * 在bean工厂初始化期间记录 {@code @Bean} 定义元数据的实用工具类。
  *
  * @author Dave Syer
  * @since 1.1.0
