@@ -80,7 +80,7 @@ public class HttpProperties {
 		private Boolean forceResponse;
 
 		/**
-		 * 用于编码映射的区域设置
+		 *  {@link Locale} 和 {@link Charset} 的对应关系
 		 */
 		private Map<Locale, Charset> mapping;
 

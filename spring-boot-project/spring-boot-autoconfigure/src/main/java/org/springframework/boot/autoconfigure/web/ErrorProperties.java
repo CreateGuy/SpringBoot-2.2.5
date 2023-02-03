@@ -19,31 +19,30 @@ package org.springframework.boot.autoconfigure.web;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
- * Configuration properties for web error handling.
- *
- * @author Michael Stummvoll
- * @author Stephane Nicoll
- * @author Vedran Pavic
- * @since 1.3.0
+ * web错误处理的配置属性
  */
 public class ErrorProperties {
 
 	/**
-	 * Path of the error controller.
+	 * 错误处理器路径
 	 */
 	@Value("${error.path:/error}")
 	private String path = "/error";
 
 	/**
-	 * Include the "exception" attribute.
+	 * 是否包含异常的信息
+	 * <p>比如说404了，是否需要将 exception 发给客户端</p>
 	 */
 	private boolean includeException;
 
 	/**
-	 * When to include a "stacktrace" attribute.
+	 * 是否包含堆栈信息
 	 */
 	private IncludeStacktrace includeStacktrace = IncludeStacktrace.NEVER;
 
+	/**
+	 * 当服务器出现错误时，是否启用浏览器显示默认错误页面
+	 */
 	private final Whitelabel whitelabel = new Whitelabel();
 
 	public String getPath() {
@@ -75,32 +74,34 @@ public class ErrorProperties {
 	}
 
 	/**
-	 * Include Stacktrace attribute options.
+	 * 是否包含堆栈信息
 	 */
 	public enum IncludeStacktrace {
 
 		/**
-		 * Never add stacktrace information.
+		 * 不添加stacktrace信息
 		 */
 		NEVER,
 
 		/**
-		 * Always add stacktrace information.
+		 * 始终添加stacktrace信息
 		 */
 		ALWAYS,
 
 		/**
-		 * Add stacktrace information when the "trace" request parameter is "true".
+		 * 当trace请求参数为true时，添加stacktrace信息
 		 */
 		ON_TRACE_PARAM
 
 	}
 
+	/**
+	 * 当服务器出现错误时，是否启用浏览器显示默认错误页面
+	 */
 	public static class Whitelabel {
 
 		/**
-		 * Whether to enable the default error page displayed in browsers in case of a
-		 * server error.
+		 * 当服务器出现错误时，是否启用浏览器显示默认错误页面
 		 */
 		private boolean enabled = true;
 

@@ -48,7 +48,8 @@ public enum DispatcherType {
 	ASYNC,
 
 	/**
-	 * 估计是出现了错误的情况下才调用此过滤器
+	 * 错误的请求
+	 * <p>比如说不存在在请求地址</p>
 	 */
 	ERROR
 

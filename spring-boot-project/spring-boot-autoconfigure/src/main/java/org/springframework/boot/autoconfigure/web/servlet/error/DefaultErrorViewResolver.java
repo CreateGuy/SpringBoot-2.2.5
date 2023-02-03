@@ -105,6 +105,12 @@ public class DefaultErrorViewResolver implements ErrorViewResolver, Ordered {
 		return modelAndView;
 	}
 
+	/**
+	 * 返回视图名对应的视图
+	 * @param viewName
+	 * @param model
+	 * @return
+	 */
 	private ModelAndView resolve(String viewName, Map<String, Object> model) {
 		String errorViewName = "error/" + viewName;
 		TemplateAvailabilityProvider provider = this.templateAvailabilityProviders.getProvider(errorViewName,
@@ -112,9 +118,16 @@ public class DefaultErrorViewResolver implements ErrorViewResolver, Ordered {
 		if (provider != null) {
 			return new ModelAndView(errorViewName, model);
 		}
+		// 把视图名当成文件名进行解析
 		return resolveResource(errorViewName, model);
 	}
 
+	/**
+	 * 把视图名当成文件名进行解析
+	 * @param viewName
+	 * @param model
+	 * @return
+	 */
 	private ModelAndView resolveResource(String viewName, Map<String, Object> model) {
 		for (String location : this.resourceProperties.getStaticLocations()) {
 			try {

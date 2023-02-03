@@ -66,6 +66,12 @@ public abstract class AbstractErrorController implements ErrorController {
 		return sorted;
 	}
 
+	/**
+	 * 返回错误信息
+	 * @param request
+	 * @param includeStackTrace
+	 * @return
+	 */
 	protected Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
 		WebRequest webRequest = new ServletWebRequest(request);
 		return this.errorAttributes.getErrorAttributes(webRequest, includeStackTrace);
@@ -79,6 +85,11 @@ public abstract class AbstractErrorController implements ErrorController {
 		return !"false".equalsIgnoreCase(parameter);
 	}
 
+	/**
+	 * 获取响应码
+	 * @param request
+	 * @return
+	 */
 	protected HttpStatus getStatus(HttpServletRequest request) {
 		Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
 		if (statusCode == null) {
@@ -93,7 +104,7 @@ public abstract class AbstractErrorController implements ErrorController {
 	}
 
 	/**
-	 * Resolve any specific error views. By default this method delegates to
+	 * 调用错误视图解析器，返回视图
 	 * {@link ErrorViewResolver ErrorViewResolvers}.
 	 * @param request the request
 	 * @param response the response

@@ -22,6 +22,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.util.unit.DataSize;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 /**
  * Properties to be used in configuring a {@link MultipartConfigElement}.
@@ -49,33 +50,33 @@ import org.springframework.util.unit.DataSize;
 public class MultipartProperties {
 
 	/**
-	 * Whether to enable support of multipart uploads.
+	 * 是否启用支持多部分上传
 	 */
 	private boolean enabled = true;
 
 	/**
-	 * Intermediate location of uploaded files.
+	 * 上传文件的保存位置
+	 * <li>但是SpringMvc中使用了 {@link org.springframework.web.multipart.support.StandardServletMultipartResolver#cleanupMultipart(MultipartHttpServletRequest)}</li>
 	 */
 	private String location;
 
 	/**
-	 * Max file size.
+	 * 最大文件大小
 	 */
 	private DataSize maxFileSize = DataSize.ofMegabytes(1);
 
 	/**
-	 * Max request size.
+	 * 最大请求大小
 	 */
 	private DataSize maxRequestSize = DataSize.ofMegabytes(10);
 
 	/**
-	 * Threshold after which files are written to disk.
+	 * 文件写入磁盘的阈值
 	 */
 	private DataSize fileSizeThreshold = DataSize.ofBytes(0);
 
 	/**
-	 * Whether to resolve the multipart request lazily at the time of file or parameter
-	 * access.
+	 * 是否在文件或参数时惰性地解析多部分请求访问
 	 */
 	private boolean resolveLazily = false;
 

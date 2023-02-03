@@ -103,6 +103,12 @@ public class ErrorMvcAutoConfiguration {
 		return new DefaultErrorAttributes(this.serverProperties.getError().isIncludeException());
 	}
 
+	/**
+	 * 处理错误的控制器
+	 * @param errorAttributes
+	 * @param errorViewResolvers
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(value = ErrorController.class, search = SearchStrategy.CURRENT)
 	public BasicErrorController basicErrorController(ErrorAttributes errorAttributes,
@@ -121,6 +127,9 @@ public class ErrorMvcAutoConfiguration {
 		return new PreserveErrorControllerTargetClassPostProcessor();
 	}
 
+	/**
+	 * 错误视图解析器配置类
+	 */
 	@Configuration(proxyBeanMethods = false)
 	static class DefaultErrorViewResolverConfiguration {
 
@@ -134,6 +143,10 @@ public class ErrorMvcAutoConfiguration {
 			this.resourceProperties = resourceProperties;
 		}
 
+		/**
+		 * 错误视图解析器
+		 * @return
+		 */
 		@Bean
 		@ConditionalOnBean(DispatcherServlet.class)
 		@ConditionalOnMissingBean(ErrorViewResolver.class)
@@ -156,8 +169,11 @@ public class ErrorMvcAutoConfiguration {
 			return this.defaultErrorView;
 		}
 
-		// If the user adds @EnableWebMvc then the bean name view resolver from
-		// WebMvcAutoConfiguration disappears, so add it back in to avoid disappointment.
+		/**
+		 * 如果用户添加了 {@link org.springframework.web.servlet.config.annotation.EnableWebMvc @EnableWebMvc}，那么 {@link WebMvcAutoConfiguration}中的bean名视图解析器就会消失，所以将它添加回来。
+		 * <li>上面是翻译出来的，实际上去掉下面的方法，{@link WebMvcAutoConfiguration} 也会注入的</li>
+		 * @return
+		 */
 		@Bean
 		@ConditionalOnMissingBean
 		public BeanNameViewResolver beanNameViewResolver() {
@@ -278,8 +294,7 @@ public class ErrorMvcAutoConfiguration {
 	}
 
 	/**
-	 * {@link BeanFactoryPostProcessor} to ensure that the target class of ErrorController
-	 * MVC beans are preserved when using AOP.
+	 * 确保在使用AOP时保留ErrorController MVC bean的目标类
 	 */
 	static class PreserveErrorControllerTargetClassPostProcessor implements BeanFactoryPostProcessor {
 

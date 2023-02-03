@@ -73,6 +73,9 @@ public abstract class AbstractServletWebServerFactory extends AbstractConfigurab
 
 	private Jsp jsp = new Jsp();
 
+	/**
+	 * {@link Locale} 和 {@link Charset} 的对应关系
+	 */
 	private Map<Locale, Charset> localeCharsetMappings = new HashMap<>();
 
 	private Map<String, String> initParameters = Collections.emptyMap();

@@ -24,7 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * Interface that can be implemented by beans that resolve error views.
+ * 错误视图解析器
  *
  * @author Phillip Webb
  * @since 1.4.0

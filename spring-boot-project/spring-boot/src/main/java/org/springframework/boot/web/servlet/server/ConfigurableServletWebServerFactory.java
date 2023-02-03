@@ -111,7 +111,7 @@ public interface ConfigurableServletWebServerFactory extends ConfigurableWebServ
 	void setJsp(Jsp jsp);
 
 	/**
-	 * Sets the Locale to Charset mappings.
+	 *  设置区域和为字符集映射的关系
 	 * @param localeCharsetMappings the Locale to Charset mappings
 	 */
 	void setLocaleCharsetMappings(Map<Locale, Charset> localeCharsetMappings);

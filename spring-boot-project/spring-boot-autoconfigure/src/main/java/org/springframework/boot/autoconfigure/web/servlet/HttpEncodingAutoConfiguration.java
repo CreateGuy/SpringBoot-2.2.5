@@ -16,7 +16,6 @@
 
 package org.springframework.boot.autoconfigure.web.servlet;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,18 +31,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import java.nio.charset.Charset;
+import java.util.Locale;
+
 /**
- * {@link EnableAutoConfiguration Auto-configuration} for configuring the encoding to use
- * in web applications.
- *
- * @author Stephane Nicoll
- * @author Brian Clozel
- * @since 2.0.0
+ * 用于配置要在web应用程序中使用的编码格式
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(HttpProperties.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass(CharacterEncodingFilter.class)
+// 设置为可以忽略，代表如果不设置依然起效果
 @ConditionalOnProperty(prefix = "spring.http.encoding", value = "enabled", matchIfMissing = true)
 public class HttpEncodingAutoConfiguration {
 
@@ -53,6 +51,10 @@ public class HttpEncodingAutoConfiguration {
 		this.properties = properties.getEncoding();
 	}
 
+	/**
+	 * 注入 {@link CharacterEncodingFilter}
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public CharacterEncodingFilter characterEncodingFilter() {
@@ -68,6 +70,9 @@ public class HttpEncodingAutoConfiguration {
 		return new LocaleCharsetMappingsCustomizer(this.properties);
 	}
 
+	/**
+	 * 配置 {@link Locale} 和 {@link Charset} 的对应关系
+	 */
 	private static class LocaleCharsetMappingsCustomizer
 			implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>, Ordered {
 

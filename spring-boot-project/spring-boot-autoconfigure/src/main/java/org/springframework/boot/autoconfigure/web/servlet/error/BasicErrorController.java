@@ -38,20 +38,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * Basic global error {@link Controller @Controller}, rendering {@link ErrorAttributes}.
- * More specific errors can be handled either using Spring MVC abstractions (e.g.
- * {@code @ExceptionHandler}) or by adding servlet
- * {@link AbstractServletWebServerFactory#setErrorPages server error pages}.
+ * 处理错误的控制器
+ * <li>不同于使用Spring MVC的(例如@ExceptionHandler)处理, 在SpringBoot中更多的是当做找不到处理方法，然后404，请求Uri变为 error，派发类型变更为 {@link org.springframework.boot.web.servlet.DispatcherType#ERROR},
+ * 然后就会到这来</li>
  *
- * @author Dave Syer
- * @author Phillip Webb
- * @author Michael Stummvoll
- * @author Stephane Nicoll
- * @since 1.0.0
- * @see ErrorAttributes
- * @see ErrorProperties
  */
 @Controller
+// 此属性默认为 error
 @RequestMapping("${server.error.path:${error.path:/error}}")
 public class BasicErrorController extends AbstractErrorController {
 
@@ -84,9 +77,17 @@ public class BasicErrorController extends AbstractErrorController {
 		return this.errorProperties.getPath();
 	}
 
+	/**
+	 * 处理text/html
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
 	public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {
+		// 获取响应码
 		HttpStatus status = getStatus(request);
+		// 获得错误信息
 		Map<String, Object> model = Collections
 				.unmodifiableMap(getErrorAttributes(request, isIncludeStackTrace(request, MediaType.TEXT_HTML)));
 		response.setStatus(status.value());
@@ -96,10 +97,12 @@ public class BasicErrorController extends AbstractErrorController {
 
 	@RequestMapping
 	public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
+		// 获取响应码
 		HttpStatus status = getStatus(request);
 		if (status == HttpStatus.NO_CONTENT) {
 			return new ResponseEntity<>(status);
 		}
+		// 获得错误信息
 		Map<String, Object> body = getErrorAttributes(request, isIncludeStackTrace(request, MediaType.ALL));
 		return new ResponseEntity<>(body, status);
 	}
@@ -111,7 +114,7 @@ public class BasicErrorController extends AbstractErrorController {
 	}
 
 	/**
-	 * Determine if the stacktrace attribute should be included.
+	 * 是否应该包括stacktrace属性
 	 * @param request the source request
 	 * @param produces the media type produced (or {@code MediaType.ALL})
 	 * @return if the stacktrace attribute should be included
