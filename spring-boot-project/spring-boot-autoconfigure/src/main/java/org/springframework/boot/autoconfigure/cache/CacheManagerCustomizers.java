@@ -24,10 +24,7 @@ import org.springframework.boot.util.LambdaSafe;
 import org.springframework.cache.CacheManager;
 
 /**
- * Invokes the available {@link CacheManagerCustomizer} instances in the context for a
- * given {@link CacheManager}.
- *
- * @author Stephane Nicoll
+ * 执行内部的 {@link CacheManagerCustomizer} 以操作 {@link CacheManager}
  * @since 1.5.0
  */
 public class CacheManagerCustomizers {

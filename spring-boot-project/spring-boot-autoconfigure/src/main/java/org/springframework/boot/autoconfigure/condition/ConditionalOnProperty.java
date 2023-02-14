@@ -126,7 +126,7 @@ public @interface ConditionalOnProperty {
 	String havingValue() default "";
 
 	/**
-	 * 当属性找不到的时候，是否忽略匹配，false为不忽略
+	 * 当属性找不到的时候，是否匹配成功，false为匹配失败
 	 */
 	boolean matchIfMissing() default false;
 

@@ -26,9 +26,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Simplest cache configuration, usually used as a fallback.
- *
- * @author Stephane Nicoll
+ * 最简单的缓存配置，通常用作备用
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnMissingBean(CacheManager.class)
@@ -43,6 +41,8 @@ class SimpleCacheConfiguration {
 		if (!cacheNames.isEmpty()) {
 			cacheManager.setCacheNames(cacheNames);
 		}
+
+		// 执行回调接口
 		return cacheManagerCustomizers.customize(cacheManager);
 	}
 

@@ -66,18 +66,32 @@ import org.springframework.util.Assert;
 @Import({ CacheConfigurationImportSelector.class, CacheManagerEntityManagerFactoryDependsOnPostProcessor.class })
 public class CacheAutoConfiguration {
 
+	/**
+	 * 是操作 {@link CacheManager} 的回调对象
+	 * @param customizers
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public CacheManagerCustomizers cacheManagerCustomizers(ObjectProvider<CacheManagerCustomizer<?>> customizers) {
 		return new CacheManagerCustomizers(customizers.orderedStream().collect(Collectors.toList()));
 	}
 
+	/**
+	 * 用于验证 {@link CacheManager} 是否存在，并提供更有意义的异常
+	 * @param cacheProperties
+	 * @param cacheManager
+	 * @return
+	 */
 	@Bean
 	public CacheManagerValidator cacheAutoConfigurationValidator(CacheProperties cacheProperties,
 			ObjectProvider<CacheManager> cacheManager) {
 		return new CacheManagerValidator(cacheProperties, cacheManager);
 	}
 
+	/**
+	 * 是一个 {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor BeanFactoryPostProcessor}，让某种类型的Bean依赖于名字叫cacheManager的Bean
+	 */
 	@ConditionalOnClass(LocalContainerEntityManagerFactoryBean.class)
 	@ConditionalOnBean(AbstractEntityManagerFactoryBean.class)
 	static class CacheManagerEntityManagerFactoryDependsOnPostProcessor
@@ -90,8 +104,7 @@ public class CacheAutoConfiguration {
 	}
 
 	/**
-	 * Bean used to validate that a CacheManager exists and provide a more meaningful
-	 * exception.
+	 * 用于验证 {@link CacheManager} 是否存在，并提供更有意义的异常
 	 */
 	static class CacheManagerValidator implements InitializingBean {
 
@@ -114,7 +127,19 @@ public class CacheAutoConfiguration {
 	}
 
 	/**
-	 * {@link ImportSelector} to add {@link CacheType} configuration classes.
+	 * 负责将SpringCache支持的缓存类型的自动配置类加入到容器中,如下所示
+	 * <ul>
+	 *     <li>0 = "org.springframework.boot.autoconfigure.cache.GenericCacheConfiguration"</li>
+	 *     <li>1 = "org.springframework.boot.autoconfigure.cache.JCacheCacheConfiguration"</li>
+	 *     <li>2 = "org.springframework.boot.autoconfigure.cache.EhCacheCacheConfiguration"</li>
+	 *     <li>3 = "org.springframework.boot.autoconfigure.cache.HazelcastCacheConfiguration"</li>
+	 *     <li>4 = "org.springframework.boot.autoconfigure.cache.InfinispanCacheConfiguration"</li>
+	 *     <li>5 = "org.springframework.boot.autoconfigure.cache.CouchbaseCacheConfiguration"</li>
+	 *     <li>6 = "org.springframework.boot.autoconfigure.cache.RedisCacheConfiguration"</li>
+	 *     <li>7 = "org.springframework.boot.autoconfigure.cache.CaffeineCacheConfiguration"</li>
+	 *     <li>8 = "org.springframework.boot.autoconfigure.cache.SimpleCacheConfiguration"</li>
+	 *     <li>9 = "org.springframework.boot.autoconfigure.cache.NoOpCacheConfiguration"</li>
+	 * </ul>
 	 */
 	static class CacheConfigurationImportSelector implements ImportSelector {
 

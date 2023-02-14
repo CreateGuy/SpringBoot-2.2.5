@@ -17,17 +17,13 @@
 package org.springframework.boot.autoconfigure.cache;
 
 /**
- * Supported cache types (defined in order of precedence).
- *
- * @author Stephane Nicoll
- * @author Phillip Webb
- * @author Eddú Meléndez
+ * SpringCache支持的缓存存储位置，越在上面优先级越高
  * @since 1.3.0
  */
 public enum CacheType {
 
 	/**
-	 * Generic caching using 'Cache' beans from the context.
+	 * 使用容器中的Cache Bean
 	 */
 	GENERIC,
 
@@ -57,7 +53,7 @@ public enum CacheType {
 	COUCHBASE,
 
 	/**
-	 * Redis backed caching.
+	 * Redis支持缓存
 	 */
 	REDIS,
 

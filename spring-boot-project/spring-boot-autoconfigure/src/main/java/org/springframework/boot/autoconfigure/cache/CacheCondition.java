@@ -29,11 +29,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.ClassMetadata;
 
 /**
- * General cache condition used with all cache configuration classes.
- *
- * @author Stephane Nicoll
- * @author Phillip Webb
- * @author Madhura Bhave
+ * 根据匹配文件中的缓存类型来返回匹配结果
  */
 class CacheCondition extends SpringBootCondition {
 
@@ -46,10 +42,14 @@ class CacheCondition extends SpringBootCondition {
 		ConditionMessage.Builder message = ConditionMessage.forCondition("Cache", sourceClass);
 		Environment environment = context.getEnvironment();
 		try {
+			// 获得匹配文件中的缓存类型
 			BindResult<CacheType> specified = Binder.get(environment).bind("spring.cache.type", CacheType.class);
+			// 没有配置，那就可以额
 			if (!specified.isBound()) {
 				return ConditionOutcome.match(message.because("automatic cache type"));
 			}
+
+			// 匹配文件中设置了缓存类型，看是否一样
 			CacheType required = CacheConfigurations.getType(((AnnotationMetadata) metadata).getClassName());
 			if (specified.get() == required) {
 				return ConditionOutcome.match(message.because(specified.get() + " cache type"));

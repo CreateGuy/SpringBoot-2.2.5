@@ -25,27 +25,29 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
- * Configuration properties for the cache abstraction.
- *
- * @author Stephane Nicoll
- * @author Eddú Meléndez
- * @author Ryon Day
+ * SpringCache 的配置文件
  * @since 1.3.0
  */
 @ConfigurationProperties(prefix = "spring.cache")
 public class CacheProperties {
 
 	/**
-	 * Cache type. By default, auto-detected according to the environment.
+	 * 缓存类型。默认情况下，根据环境自动检测
 	 */
 	private CacheType type;
 
 	/**
-	 * Comma-separated list of cache names to create if supported by the underlying cache
-	 * manager. Usually, this disables the ability to create additional caches on-the-fly.
+	 * 缓存的名称
+	 * <ul>
+	 *     <li>没太懂具体的应用场景</li>
+	 *     <li>像 {@link SimpleCacheConfiguration} 只是将这些缓存名称加上一个特殊的值保存在内存中，难道只是先创建一个位置吗</li>
+	 * </ul>
 	 */
 	private List<String> cacheNames = new ArrayList<>();
 
+	/**
+	 * 下面这几个都是各大缓存/数据库的配置文件
+	 */
 	private final Caffeine caffeine = new Caffeine();
 
 	private final Couchbase couchbase = new Couchbase();
@@ -115,7 +117,7 @@ public class CacheProperties {
 	}
 
 	/**
-	 * Caffeine specific cache properties.
+	 * Caffeine：是基于 Java 8 的高性能，接近最佳的缓存库
 	 */
 	public static class Caffeine {
 
@@ -136,7 +138,7 @@ public class CacheProperties {
 	}
 
 	/**
-	 * Couchbase specific cache properties.
+	 * CouchBase：是一款开源的、分布式的、面向文档的NoSQL数据库
 	 */
 	public static class Couchbase {
 
@@ -157,7 +159,7 @@ public class CacheProperties {
 	}
 
 	/**
-	 * EhCache specific cache properties.
+	 * EhCache：纯Java的进程内缓存框架
 	 */
 	public static class EhCache {
 
@@ -197,7 +199,7 @@ public class CacheProperties {
 	}
 
 	/**
-	 * JCache (JSR-107) specific cache properties.
+	 * JCache (JSR-107)：一种对Java对象临时在内存中进行缓存的方法
 	 */
 	public static class JCache {
 
@@ -233,27 +235,27 @@ public class CacheProperties {
 	}
 
 	/**
-	 * Redis-specific cache properties.
+	 * Redis缓存配置
 	 */
 	public static class Redis {
 
 		/**
-		 * Entry expiration. By default the entries never expire.
+		 * 缓存的过期时间(剩余活跃时间)
 		 */
 		private Duration timeToLive;
 
 		/**
-		 * Allow caching null values.
+		 * 是否允许空值
 		 */
 		private boolean cacheNullValues = true;
 
 		/**
-		 * Key prefix.
+		 * 键前缀
 		 */
 		private String keyPrefix;
 
 		/**
-		 * Whether to use the key prefix when writing to Redis.
+		 * 写入Redis时是否使用key前缀
 		 */
 		private boolean useKeyPrefix = true;
 

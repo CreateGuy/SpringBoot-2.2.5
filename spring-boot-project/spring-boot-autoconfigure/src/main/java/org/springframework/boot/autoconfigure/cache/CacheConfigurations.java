@@ -23,10 +23,7 @@ import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
- * Mappings between {@link CacheType} and {@code @Configuration}.
- *
- * @author Phillip Webb
- * @author Eddú Meléndez
+ * {@link CacheType} 和 对应的自动配置类的映射关系
  */
 final class CacheConfigurations {
 
@@ -50,6 +47,11 @@ final class CacheConfigurations {
 	private CacheConfigurations() {
 	}
 
+	/**
+	 * 返回此缓存类型的自动配置类
+	 * @param cacheType
+	 * @return
+	 */
 	static String getConfigurationClass(CacheType cacheType) {
 		Class<?> configurationClass = MAPPINGS.get(cacheType);
 		Assert.state(configurationClass != null, () -> "Unknown cache type " + cacheType);

@@ -34,24 +34,25 @@ import org.springframework.core.Ordered;
 import org.springframework.util.StringUtils;
 
 /**
- * Abstract base class for a {@link BeanFactoryPostProcessor} that can be used to
- * dynamically declare that all beans of a specific type should depend on specific other
- * beans identified by name or type.
- *
- * @author Marcel Overdijk
- * @author Dave Syer
- * @author Phillip Webb
- * @author Andy Wilkinson
- * @author Dmytro Nosan
+ * 动态的告诉某种类型的Bean需要依赖某个Bean
  * @since 1.3.0
  * @see BeanDefinition#setDependsOn(String[])
  */
 public abstract class AbstractDependsOnBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
+	/**
+	 * 哪种类型的Bean需要依赖下面的dependsOn
+	 */
 	private final Class<?> beanClass;
 
+	/**
+	 * 哪种类型的Bean需要依赖下面的dependsOn
+	 */
 	private final Class<? extends FactoryBean<?>> factoryBeanClass;
 
+	/**
+	 * 其他Bean需要依赖的Bean的名称
+	 */
 	private final Function<ListableBeanFactory, Set<String>> dependsOn;
 
 	/**
@@ -64,6 +65,7 @@ public abstract class AbstractDependsOnBeanFactoryPostProcessor implements BeanF
 			Class<? extends FactoryBean<?>> factoryBeanClass, String... dependsOn) {
 		this.beanClass = beanClass;
 		this.factoryBeanClass = factoryBeanClass;
+		// dependsOn默认就是EntityManagerFactoryDependsOnPostProcessor中设置的字符串cacheManager
 		this.dependsOn = (beanFactory) -> new HashSet<>(Arrays.asList(dependsOn));
 	}
 
@@ -103,6 +105,10 @@ public abstract class AbstractDependsOnBeanFactoryPostProcessor implements BeanF
 		this(beanClass, null, dependencyTypes);
 	}
 
+	/**
+	 * 让容器中的指定类型的Bean都依赖dependsOn
+	 * @param beanFactory
+	 */
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		for (String beanName : getBeanNames(beanFactory)) {
@@ -120,6 +126,11 @@ public abstract class AbstractDependsOnBeanFactoryPostProcessor implements BeanF
 		return 0;
 	}
 
+	/**
+	 * 获得容器中指定类型的所有Bean名称
+	 * @param beanFactory
+	 * @return
+	 */
 	private Set<String> getBeanNames(ListableBeanFactory beanFactory) {
 		Set<String> names = getBeanNames(beanFactory, this.beanClass);
 		if (this.factoryBeanClass != null) {
@@ -128,6 +139,12 @@ public abstract class AbstractDependsOnBeanFactoryPostProcessor implements BeanF
 		return names;
 	}
 
+	/**
+	 * 获得容器中指定类型的所有Bean名称
+	 * @param beanFactory
+	 * @param beanClass
+	 * @return
+	 */
 	private static Set<String> getBeanNames(ListableBeanFactory beanFactory, Class<?> beanClass) {
 		String[] names = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, beanClass, true, false);
 		return Arrays.stream(names).map(BeanFactoryUtils::transformedBeanName).collect(Collectors.toSet());
