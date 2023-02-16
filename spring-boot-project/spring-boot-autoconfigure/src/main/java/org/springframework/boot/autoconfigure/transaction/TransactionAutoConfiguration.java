@@ -42,11 +42,7 @@ import org.springframework.transaction.support.TransactionOperations;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * {@link org.springframework.boot.autoconfigure.EnableAutoConfiguration
- * Auto-configuration} for Spring transaction.
- *
- * @author Stephane Nicoll
- * @since 1.3.0
+ * Spring事务的自动配置类
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(PlatformTransactionManager.class)

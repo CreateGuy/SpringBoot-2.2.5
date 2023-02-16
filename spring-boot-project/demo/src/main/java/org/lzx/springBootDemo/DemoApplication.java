@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
@@ -19,7 +20,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @ImportResource(value = "classpath:bean.xml")
 //@Import(value = AutoMessage.class)
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)
-@EnableCaching
+@EnableAsync
 public class DemoApplication {
 
 	public static void main(String[] args) {
