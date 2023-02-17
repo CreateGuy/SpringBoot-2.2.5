@@ -24,25 +24,19 @@ import org.springframework.boot.convert.DurationUnit;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
 /**
- * Configuration properties that can be applied to an
- * {@link AbstractPlatformTransactionManager}.
- *
- * @author Kazuki Shimizu
- * @author Phillip Webb
- * @since 1.5.0
+ * Spring事务的属性：用在 {@link AbstractPlatformTransactionManager} 中的
  */
 @ConfigurationProperties(prefix = "spring.transaction")
 public class TransactionProperties implements PlatformTransactionManagerCustomizer<AbstractPlatformTransactionManager> {
 
 	/**
-	 * Default transaction timeout. If a duration suffix is not specified, seconds will be
-	 * used.
+	 * 默认事务超时时间。如果没有指定持续时间后缀，则将使用秒
 	 */
 	@DurationUnit(ChronoUnit.SECONDS)
 	private Duration defaultTimeout;
 
 	/**
-	 * Whether to roll back on commit failures.
+	 * 是否回滚提交失败的情况
 	 */
 	private Boolean rollbackOnCommitFailure;
 
