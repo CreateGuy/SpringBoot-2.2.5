@@ -121,7 +121,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		}
 		//获得有关@EnableAutoConfiguration的属性
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
-		//获得当前导入选择器所选择需要导入的类
+		// 从指定路径下获得自动配置类
 		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
 		//移除重复的
 		configurations = removeDuplicates(configurations);
@@ -179,13 +179,10 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	}
 
 	/**
-	 * Return the auto-configuration class names that should be considered. By default
-	 * this method will load candidates using {@link SpringFactoriesLoader} with
-	 * {@link #getSpringFactoriesLoaderFactoryClass()}.
-	 * @param metadata the source metadata
-	 * @param attributes the {@link #getAttributes(AnnotationMetadata) annotation
-	 * attributes}
-	 * @return a list of candidate configurations
+	 * 从指定路径下获得自动配置类
+	 * @param metadata
+	 * @param attributes
+	 * @return
 	 */
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
 		List<String> configurations = SpringFactoriesLoader.loadFactoryNames(getSpringFactoriesLoaderFactoryClass(),
@@ -318,12 +315,12 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	}
 
 	/**
-	 * 获得bean工厂中是AutoConfigurationImportFilter的bean
-	 *  默认只有三个类：
-	 *  	OnBeanCondition：检查bean工厂中是否有某些bean等等
-	 *  	OnClassCondition：检查是否有某些类等等
-	 *  	OnWebApplicationCondition：检查当前是否是web环境等等
-	 *
+	 * 获得bean工厂中是AutoConfigurationImportFilter的bean，默认只有三个类
+	 * <ul>
+	 *    <li>{@link org.springframework.boot.autoconfigure.condition.OnBeanCondition OnBeanCondition}：检查bean工厂中是否有某些bean等等</li>
+	 *    <li>{@link org.springframework.boot.autoconfigure.condition.OnClassCondition OnClassCondition}：检查是否有某些类等等</li>
+	 *    <li>{@link org.springframework.boot.autoconfigure.condition.OnWebApplicationCondition OnWebApplicationCondition}：检查当前是否是web环境等等</li>
+	 * </ul>
 	 * @return
 	 */
 	protected List<AutoConfigurationImportFilter> getAutoConfigurationImportFilters() {
@@ -470,7 +467,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 			//获得符合条件的自动配置类
 			AutoConfigurationEntry autoConfigurationEntry = ((AutoConfigurationImportSelector) deferredImportSelector)
 					.getAutoConfigurationEntry(getAutoConfigurationMetadata(), annotationMetadata);
-			//将符合调价的自动配置类添加到对应的集合中
+			//将符合条件的自动配置类添加到对应的集合中
 			this.autoConfigurationEntries.add(autoConfigurationEntry);
 			for (String importClassName : autoConfigurationEntry.getConfigurations()) {
 				this.entries.putIfAbsent(importClassName, annotationMetadata);

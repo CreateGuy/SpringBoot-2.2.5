@@ -1,0 +1,8 @@
+user:
+  name: 1
+  password: 1
+spring:
+  profiles:
+    active: dev
+server:
+  port: 8080
