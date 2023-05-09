@@ -19,7 +19,7 @@ package org.springframework.boot.context.properties.bind;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 
 /**
- * Callback interface that can be used to handle additional logic during element
+ * 可用于在元素绑定期间处理附加逻辑的回调接口
  * {@link Binder binding}.
  *
  * @author Phillip Webb

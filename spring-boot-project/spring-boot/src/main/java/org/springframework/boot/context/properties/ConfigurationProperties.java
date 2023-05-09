@@ -52,8 +52,8 @@ public @interface ConfigurationProperties {
 	String value() default "";
 
 	/**
-	 * The prefix of the properties that are valid to bind to this object. Synonym for
-	 * {@link #value()}. A valid prefix is defined by one or more words separated with
+	 * 可有效绑定到此对象的属性的前缀。
+	 * <p>Synonym for {@link #value()}. A valid prefix is defined by one or more words separated with
 	 * dots (e.g. {@code "acme.system.feature"}).
 	 * @return the prefix of the properties to bind
 	 */

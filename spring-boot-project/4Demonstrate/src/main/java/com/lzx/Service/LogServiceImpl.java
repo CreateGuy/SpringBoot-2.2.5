@@ -14,6 +14,9 @@ import javax.annotation.Resource;
 @Component
 public class LogServiceImpl {
 
+	@Resource
+	private UserServiceImpl userService;
+
 	public Boolean saveLog(User user) {
 		return Boolean.TRUE;
 	}

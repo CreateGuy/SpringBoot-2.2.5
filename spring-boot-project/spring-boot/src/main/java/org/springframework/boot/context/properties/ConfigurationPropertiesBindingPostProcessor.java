@@ -103,12 +103,14 @@ public class ConfigurationPropertiesBindingPostProcessor
 	 * @param bean
 	 */
 	private void bind(ConfigurationPropertiesBean bean) {
+		// 确定Bean是否是 @ConfigurationProperties 对象
 		if (bean == null || hasBoundValueObject(bean.getName())) {
 			return;
 		}
 		Assert.state(bean.getBindMethod() == BindMethod.JAVA_BEAN, "Cannot bind @ConfigurationProperties for bean '"
 				+ bean.getName() + "'. Ensure that @ConstructorBinding has not been applied to regular bean");
 		try {
+			// 开始绑定
 			this.binder.bind(bean);
 		}
 		catch (Exception ex) {
@@ -116,6 +118,11 @@ public class ConfigurationPropertiesBindingPostProcessor
 		}
 	}
 
+	/**
+	 * 确定Bean是否是 {@link ConfigurationProperties @ConfigurationProperties} 对象
+	 * @param beanName
+	 * @return
+	 */
 	private boolean hasBoundValueObject(String beanName) {
 		return this.registry.containsBeanDefinition(beanName) && this.registry
 				.getBeanDefinition(beanName) instanceof ConfigurationPropertiesValueObjectBeanDefinition;

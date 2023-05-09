@@ -20,8 +20,7 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * Event to be published after the application context is refreshed and the
- * {@link WebServer} is ready. Useful for obtaining the local port of a running server.
+ * 在应用程序上下文刷新并且 {@link WebServer} 准备好之后发布。用于获取正在运行的服务器的本地端口
  *
  * @author Brian Clozel
  * @author Stephane Nicoll

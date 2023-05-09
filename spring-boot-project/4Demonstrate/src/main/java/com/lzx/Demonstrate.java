@@ -19,8 +19,4 @@ public class Demonstrate {
 		SpringApplication.run(Demonstrate.class);
 	}
 
-	@Bean
-	public LogServiceImpl logService(UserServiceImpl userService, List<UserServiceImpl> userServicesList) {
-		return new LogServiceImpl();
-	}
 }

@@ -82,10 +82,17 @@ class ConfigurationPropertiesBinder {
 		this.jsr303Present = ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContext);
 	}
 
+	/**
+	 * 绑定属性
+	 * @param propertiesBean
+	 * @return
+	 */
 	BindResult<?> bind(ConfigurationPropertiesBean propertiesBean) {
 		Bindable<?> target = propertiesBean.asBindTarget();
 		ConfigurationProperties annotation = propertiesBean.getAnnotation();
+		// 获得可用于在元素绑定期间处理附加处理逻辑的帮助器
 		BindHandler bindHandler = getBindHandler(target, annotation);
+		// 开始绑定
 		return getBinder().bind(annotation.prefix(), target, bindHandler);
 	}
 
@@ -103,25 +110,46 @@ class ConfigurationPropertiesBinder {
 		return null;
 	}
 
+	/**
+	 * 获得可用于在元素绑定期间处理附加处理逻辑的帮助器
+	 * @param target
+	 * @param annotation
+	 * @param <T>
+	 * @return
+	 */
 	private <T> BindHandler getBindHandler(Bindable<T> target, ConfigurationProperties annotation) {
+		// 获得支持目标类校验的校验器
 		List<Validator> validators = getValidators(target);
 		BindHandler handler = new IgnoreTopLevelConverterNotFoundBindHandler();
+
+		// 在绑定过程出现了错误，比如说字段类型错误，是否忽略
 		if (annotation.ignoreInvalidFields()) {
 			handler = new IgnoreErrorsBindHandler(handler);
 		}
+
+		// 绑定过程中是否应该忽略未知字段
 		if (!annotation.ignoreUnknownFields()) {
 			UnboundElementsSourceFilter filter = new UnboundElementsSourceFilter();
 			handler = new NoUnboundElementsBindHandler(handler, filter);
 		}
+
+
 		if (!validators.isEmpty()) {
 			handler = new ValidationBindHandler(handler, validators.toArray(new Validator[0]));
 		}
+
+		// 执行回调的切面
 		for (ConfigurationPropertiesBindHandlerAdvisor advisor : getBindHandlerAdvisors()) {
 			handler = advisor.apply(handler);
 		}
 		return handler;
 	}
 
+	/**
+	 * 返回支持目标类校验的校验器
+	 * @param target
+	 * @return
+	 */
 	private List<Validator> getValidators(Bindable<?> target) {
 		List<Validator> validators = new ArrayList<>(3);
 		if (this.configurationPropertiesValidator != null) {

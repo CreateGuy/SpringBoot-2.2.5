@@ -16,6 +16,9 @@ import java.util.Collection;
 @Component
 public class UserServiceImpl {
 
+	@Resource
+	private LogServiceImpl logService;
+
 	public User getUser() {
 		Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority("admin"));
