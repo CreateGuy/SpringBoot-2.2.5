@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Conditional;
 
 /**
  * {@link Conditional @Conditional}的衍生注解，检查容器中是否没有某个Bean
+ * <li>如果说没有指定类型并且方法作用在方法上，那么让方法返回值类型进行判断，详情见 {@link org.springframework.boot.autoconfigure.condition.OnBeanCondition.Spec Spec} 的构造方法</li>
  * <p>
  * When placed on a {@code @Bean} method, the bean class defaults to the return type of
  * the factory method:

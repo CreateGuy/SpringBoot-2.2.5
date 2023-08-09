@@ -561,9 +561,10 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 			Set<String> types = extractTypes(attributes);
 			BeanTypeDeductionException deductionException = null;
 			// 如果没有指定匹配名称和类型
+			// 比如说@ConditionalOnMissingBean
 			if (types.isEmpty() && this.names.isEmpty()) {
 				try {
-					// 如果是放在方法上的注解，返回这个方法的返回值类型
+					// 如果是放在方法上的注解，返回这个方法的返回值类型，作为要求的类型
 					types = deducedBeanType(context, metadata);
 				}
 				catch (BeanTypeDeductionException ex) {

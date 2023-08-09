@@ -1,6 +1,8 @@
 package org.lzx.springBootDemo.controller;
 
 import org.lzx.springBootDemo.service.IStatementsService;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,7 +20,7 @@ public class HelloController {
 
 	@GetMapping("hello")
 	@ResponseBody
-	public String hello(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public String hello(HttpServletRequest request, HttpServletResponse response, @AuthenticationPrincipal UserDetails userDetails) throws IOException {
 		statementsService.updateA();
 		return "hello";
 	}

@@ -50,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/js/**", "/css/**", "/images/**", "/**");
+        web.ignoring().antMatchers("/js/**", "/css/**", "/images/**");
         //web.ignoring().antMatchers("/hello2");
 //        web.ignoring().antMatchers("/**");
     }
@@ -61,36 +61,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/hello").hasRole("admin")
 				.antMatchers("/hello1").hasAuthority("RUN_AS_security")
 				.anyRequest().authenticated()
-				.withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
-					@Override
-					public <O extends FilterSecurityInterceptor> O postProcess(O object) {
-						object.setRunAsManager(new RunAsManagerImpl());
-						return object;
-					}
-				})
-				.and()
-				.sessionManagement()
-				.maximumSessions(1)
-				.and()
-				.and()
-				.logout().logoutUrl("aaa")
-				.and()
-				.requestCache()
-				.and()
-				.rememberMe()
 				.and()
 				.formLogin()
 				.and()
-//				.disable()
-//				.httpBasic()
-//				.withObjectPostProcessor()
-				.requiresChannel()
-				.and()
                 .csrf()
                 .disable();
-		SwitchUserFilter filter = new SwitchUserFilter();
-		filter.setSuccessHandler(new SimpleUrlAuthenticationSuccessHandler());
-		filter.setUserDetailsService(userDetailsService());
-		http.addFilter(filter);
+
+        http.requiresChannel()
+				.channelProcessors(new ArrayList<>());
+				//.antMatchers()
+				//.mvcMatchers("/*").requires("REQUIRES_SECURE_CHANNEL");
 	}
 }
