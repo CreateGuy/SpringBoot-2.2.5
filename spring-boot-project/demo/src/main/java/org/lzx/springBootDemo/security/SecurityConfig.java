@@ -16,9 +16,21 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
+import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -66,10 +78,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
                 .csrf()
                 .disable();
-
-        http.requiresChannel()
-				.channelProcessors(new ArrayList<>());
 				//.antMatchers()
 				//.mvcMatchers("/*").requires("REQUIRES_SECURE_CHANNEL");
+		http.rememberMe()
+				.rememberMeServices(new PersistentTokenBasedRememberMeServices("key1", userDetailsService(), new InMemoryTokenRepositoryImpl()));
 	}
 }
